@@ -1,0 +1,54 @@
+@use "@/styles/variables" as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  padding: $space-2 $space-4;
+  border-radius: $radius-base;
+  font-size: $font-size-base;
+  font-weight: 600;
+  border: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+.primary {
+  background: linear-gradient(135deg, $color-gold, darken($color-gold, 12%));
+  color: $color-bg;
+
+  &:not(:disabled):hover {
+    box-shadow: 0 6px 16px rgba($color-gold, 0.35);
+  }
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid $color-border;
+  color: $color-text;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

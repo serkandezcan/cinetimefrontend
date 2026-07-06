@@ -5,4 +5,4 @@ out
 .vercel
 .DS_Store
 *.log
-.idea/
+.idea/.env*.local

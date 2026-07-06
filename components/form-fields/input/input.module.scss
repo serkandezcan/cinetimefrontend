@@ -1,0 +1,82 @@
+@use "@/styles/variables" as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-bottom: $space-3;
+}
+
+.label {
+  font-size: $font-size-sm;
+  color: $color-muted;
+  font-weight: 500;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $color-border;
+  border-radius: $radius-base;
+  padding: $space-2 $space-3;
+  color: $color-text;
+  font-size: $font-size-base;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: rgba($color-muted, 0.6);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-gold;
+    box-shadow: 0 0 0 3px rgba($color-gold, 0.15);
+  }
+}
+
+.hasIcon {
+  padding-right: $space-5;
+}
+
+.toggleButton {
+  position: absolute;
+  right: $space-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: $space-1;
+  color: $color-muted;
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+  }
+}
+
+.inputError {
+  border-color: $color-red;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($color-red, 0.15);
+  }
+}
+
+.errorText {
+  font-size: $font-size-sm;
+  color: $color-red;
+}
+
+.helperText {
+  font-size: $font-size-sm;
+  color: $color-muted;
+}
