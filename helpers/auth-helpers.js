@@ -1,32 +1,50 @@
 import { auth } from "@/auth";
-import { config } from "./config";
 
-const parseJWT = (token) => {
-  try {
-    return JSON.parse(atob(token.split(".")[1]));
-  } catch {
-    return null;
-  }
-};
+export async function getCurrentSession() {
+  return auth();
+}
 
-export const getIsTokenValid = (token) => {
-  if (!token) return false;
-  const payload = parseJWT(token);
-  if (!payload?.exp) return false;
-  return payload.exp >= Math.floor(Date.now() / 1000);
-};
-
-export const getIsUserAuthorized = (role, path) => {
-  const userRight = config.userRightsOnRoutes.find((item) => item.urlRegex.test(path));
-  if (!userRight) return true;
-  return userRight.roles.includes(role);
-};
-
-export const getAuthHeader = async () => {
+export async function requireSession() {
   const session = await auth();
-  const token = session?.accessToken;
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
+  if (!session) {
+    throw new Error(
+      "Oturum bulunamadı. Bu fonksiyon sadece login sonrası çağrılmalı."
+    );
+  }
+  return session;
+}
+
+export async function getAccessToken() {
+  const session = await auth();
+  return session?.accessToken ?? null;
+}
+
+/**
+ * JWT'nin süresi dolmuş mu kontrol eder (imza doğrulamadan, sadece `exp` claim'i).
+ * Not: middleware (proxy.js) Edge runtime'da çalışır, Node'un `Buffer`'ı
+ * her zaman garanti değildir — bu yüzden atob tabanlı, Edge-uyumlu decode kullanıyoruz.
+ */
+export function getIsTokenValid(token) {
+  if (!token) return false;
+
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    if (!decoded.exp) return true; // exp yoksa süresiz kabul ediyoruz
+    return Date.now() < decoded.exp * 1000;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Role bazlı route yetkilendirmesi.
+ * Şu an sadece /admin/* prefix'ini ADMIN role'üyle sınırlıyor — ihtiyaç
+ * arttıkça buraya yeni kural eklenir.
+ */
+export function getIsUserAuthorized(role, pathname) {
+  if (pathname.startsWith("/admin")) {
+    return role === "ADMIN";
+  }
+  return true;
+}

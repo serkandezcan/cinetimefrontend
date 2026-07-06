@@ -1,22 +1,101 @@
-import { config } from "./config";
 
-export const LOGIN_API = `${config.apiURL}/auth/login`;
-export const REGISTER_API = `${config.apiURL}/auth/register`;
+// Backend API route tanımları.
 
-export const MOVIES_API = `${config.apiURL}/api/movies`;
-export const MOVIE_DETAIL_API = (id) => `${config.apiURL}/api/movies/${id}`;
 
-export const CINEMAS_API = `${config.apiURL}/cinemas`;
-export const CINEMA_DETAIL_API = (id) => `${config.apiURL}/cinemas/${id}`;
+export const API_ROUTES = {
+  auth: {
+    login: "/auth/login",
+    register: "/auth/register",
+    logout: "/auth/logout",
+    refreshToken: "/auth/refresh-token",
+    forgotPassword: "/auth/forgot-password",
+    resetPassword: "/auth/reset-password",
+  },
 
-export const SHOWTIMES_API = `${config.apiURL}/showtimes`;
-export const SHOWTIME_SEATS_API = (id) => `${config.apiURL}/showtimes/${id}/seats`;
+  // Giriş yapmış kullanıcının kendi profili
+  user: {
+    me: "/user/me",
+    updateMe: "/user/me", // PATCH
+    deleteMe: "/user/me", // DELETE
+    updatePassword: "/user/me/password", // PATCH
+  },
 
-export const CUSTOMER_BOOKINGS_API = `${config.apiURL}/customer/bookings`;
-export const CUSTOMER_PAYMENT_API = (bookingId) => `${config.apiURL}/customer/bookings/${bookingId}/payment`;
-export const CUSTOMER_BOOKING_TICKETS_API = (bookingId) => `${config.apiURL}/customer/bookings/${bookingId}/tickets`;
-export const CUSTOMER_TICKET_DETAIL_API = (ticketNumber) => `${config.apiURL}/customer/tickets/${ticketNumber}`;
+  // Admin - kullanıcı yönetimi
+  adminUsers: {
+    list: "/admin/users",
+    detail: (id) => `/admin/user/${id}`,
+    update: (id) => `/admin/user/${id}`, // PATCH
+    delete: (id) => `/admin/user/${id}`, // DELETE
+  },
 
-export const ADMIN_CINEMAS_API = `${config.apiURL}/admin/cinemas`;
-export const ADMIN_HALLS_API = `${config.apiURL}/admin/halls`;
-export const ADMIN_SHOWTIMES_API = `${config.apiURL}/admin/showtimes`;
+  //
+  /* 
+    adminMovies: {
+    create: "admin/movies", // POST
+    update: (id) => `admin/movies/${id}`, // PUT
+    delete: (id) => `admin/movies/${id}`, // DELETE
+    detail: (id) => `admin/movies/${id}/`, 
+  },
+ */
+
+  /* 
+    movies: {
+    list: "/movies",
+    detail: (id) => `/movies/${id}`,
+    detailBySlug: (slug) => `/movies/slug/${slug}`,
+    showTimes: (id) => `/movies/${id}/show-times`,
+    inTheaters: "/movies/in-theaters",
+    comingSoon: "/movies/coming-soon",
+    archived: "/movies/archived",
+    byHall: (hall) => `/movies/hall/${hall}`,
+  },
+ */
+  movies: {
+    list: "/api/movies",
+    create: "/api/movies", // POST
+    detail: (id) => `/api/movies/${id}`,
+    update: (id) => `/api/movies/${id}`, // PUT
+    delete: (id) => `/api/movies/${id}`, // DELETE
+    detailAdmin: (id) => `/api/movies/${id}/admin`,
+    detailBySlug: (slug) => `/api/movies/slug/${slug}`,
+    showTimes: (id) => `/api/movies/${id}/show-times`,
+    inTheaters: "/api/movies/in-theaters",
+    comingSoon: "/api/movies/coming-soon",
+    archived: "/api/movies/archived",
+    byHall: (hall) => `/api/movies/hall/${hall}`,
+  },
+
+  cinemas: {
+    list: "/cinemas",
+    detail: (id) => `/cinemas/${id}`,
+  },
+
+  showtimes: {
+    list: "/showtimes",
+    seats: (id) => `/showtimes/${id}/seats`,
+  },
+
+  // Admin - showtime/hall/cinema yönetimi
+  admin: {
+    createShowtime: "/admin/showtimes", // POST
+    cancelShowtime: (id) => `/admin/showtimes/${id}/cancel`, // PATCH
+    createHall: "/admin/halls", // POST
+    createCinema: "/admin/cinemas", // POST
+  },
+
+  // Müşteri - rezervasyon/booking işlemleri
+  bookings: {
+    list: "/customer/bookings",
+    create: "/customer/bookings", // POST
+    detail: (id) => `/customer/bookings/${id}`,
+    pay: (id) => `/customer/bookings/${id}/payment`, // POST
+    cancel: (id) => `/customer/bookings/${id}/cancel`, // PATCH
+    tickets: (id) => `/customer/bookings/${id}/tickets`,
+  },
+
+  tickets: {
+    detailByNumber: (ticketNumber) => `/customer/tickets/${ticketNumber}`,
+  },
+};
+
+export default API_ROUTES;

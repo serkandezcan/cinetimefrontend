@@ -1,0 +1,12 @@
+@use "@/styles/variables" as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formError {
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}

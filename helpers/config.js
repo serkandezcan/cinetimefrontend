@@ -1,3 +1,10 @@
+// Merkezi konfigürasyon dosyası
+// Tüm env değişkenleri buradan okunur, kod icinde
+// process.env dogrudan kullanilmaz.
+
+
+const isBrowser = typeof window !== "undefined";
+
 export const config = {
   project: {
     name: "CineTime",
@@ -14,4 +21,17 @@ export const config = {
     { urlRegex: /^\/tickets(\/.*)?$/, roles: ["CUSTOMER"] },
     { urlRegex: /^\/bookings(\/.*)?$/, roles: ["CUSTOMER"] },
   ],
+
+  // Sadece server tarafında kullanılır (Auth.js secret)
+  authSecret: process.env.AUTH_SECRET,
+
+  // Ortam bilgisi
+  isProduction: process.env.NODE_ENV === "production",
+  isDevelopment: process.env.NODE_ENV === "development",
+}
+
+if (!isBrowser && config.isProduction && !config.authSecret) {
+  console.warn(
+    "[config] AUTH_SECRET tanımlı değil. Production build'de bu zorunludur."
+  );  
 };

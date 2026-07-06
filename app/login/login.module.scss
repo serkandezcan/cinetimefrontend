@@ -1,0 +1,28 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.wrapper {
+  min-height: calc(100vh - #{$header-height} - #{$footer-height});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-5 0;
+}
+
+.card {
+  @include glass-panel;
+  width: 100%;
+  max-width: 420px;
+  padding: $space-5;
+}
+
+.title {
+  font-size: $font-size-xl;
+  margin: 0 0 $space-1;
+}
+
+.subtitle {
+  color: $color-muted;
+  font-size: $font-size-sm;
+  margin: 0 0 $space-4;
+}
