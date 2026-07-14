@@ -44,7 +44,7 @@ export function getIsTokenValid(token) {
  */
 export function getIsUserAuthorized(role, pathname) {
   if (pathname.startsWith("/admin")) {
-    return role === "ADMIN";
+    return role === "ROLE_ADMIN";
   }
   return true;
 }

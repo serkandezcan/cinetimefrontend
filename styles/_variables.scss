@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // -----------------------------------------------------------------------
 // Design tokens
 // -----------------------------------------------------------------------
@@ -21,10 +23,16 @@ $body-color: $color-text;
 $color-surface: $color-panel;
 $color-text-muted: $color-muted;
 $color-primary: $color-gold;
-$color-primary-hover: darken($color-gold, 12%);
+$color-primary-hover: color.adjust($color-gold, $lightness: -12%);
 $color-border: $color-panel-soft;
 $color-danger: $color-red;
 $color-success: #3ecf8e;
+
+// Overlay/scrim token'ları — header gradient'i, modal backdrop'ları vb.
+// için. Renk hardcoded rgba() yazmak yerine buradan türetiliyor.
+$overlay-strong: rgba($color-bg, 0.85);
+$overlay-soft: rgba($color-bg, 0.4);
+$overlay-transparent: rgba($color-bg, 0);
 
 // Typography
 $font-family-base: "Inter", system-ui, -apple-system, sans-serif;
@@ -32,6 +40,27 @@ $font-size-sm: 0.875rem;
 $font-size-base: 1rem;
 $font-size-lg: 1.25rem;
 $font-size-xl: 1.75rem;
+
+// Height scale
+$height-xs: 32px;
+$height-sm: 40px;
+$height-md: 48px;
+$height-lg: 56px;
+$height-xl: 64px;
+$height-2xl: 72px;
+$height-3xl: 80px;
+$height-4xl: 88px;
+$height-5xl: 96px;
+
+// Component heights
+$height-header-mobile: $height-xl; // 64px
+$height-header-desktop: $height-2xl; // 72px
+$height-button-sm: $height-sm; // 40px
+$height-button-md: $height-md; // 48px
+$height-input: $height-md; // 48px
+$height-card-image-sm: 180px;
+$height-card-image-md: 240px;
+$height-card-image-lg: 320px;
 
 // Spacing scale
 $space-1: 0.25rem;
@@ -41,12 +70,34 @@ $space-4: 1.5rem;
 $space-5: 2.5rem;
 
 // Layout
-$header-height: 64px;
+$header-height: $height-header-desktop; // eski kodlarla geriye dönük uyum
 $footer-height: 96px;
 $container-max-width: 1200px;
 $radius-base: 8px;
+$radius-pill: 999px;
 
 // Breakpoints
 $breakpoint-sm: 480px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
+
+// Z-index scale — "hangi katman üstte" kararını burada merkezileştir
+$z-header: 1000;
+$z-dropdown: 1010;
+$z-modal: 1050;
+
+// Motion — geçiş sürelerini burada tek yerden yönet
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s ease;
+
+// Ekstra radius/motion/typography token'ları — dropdown, kart, hover
+// efektleri gibi component'lerde tekrar eden "sihirli sayılar" için.
+$radius-lg: 16px;
+$width-mobile-menu: 280px;
+$scale-hover: 1.06;
+$letter-spacing-tight: -0.01em;
+$letter-spacing-wide: 0.01em;
+
+// Ekstra radius (kart ve modern buton için)
+$radius-xl: 20px;
+$radius-pill: 999px;

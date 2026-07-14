@@ -1,0 +1,81 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.section {
+  @include glass-panel;
+  padding: $space-4;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0 0 $space-3;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+}
+
+.selectField {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-bottom: $space-3;
+}
+
+.selectLabel {
+  font-size: 0.75rem;
+  color: rgba($color-text, 0.55);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: $radius-base;
+  padding: 13px $space-3;
+  color: $color-text;
+  font-size: $font-size-base;
+  height: $height-input;
+  transition: border-color $transition-fast, box-shadow $transition-fast,
+    background-color $transition-fast;
+
+  &:hover {
+    border-color: rgba($color-text, 0.18);
+  }
+
+  &:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba($color-gold, 0.6);
+    box-shadow: 0 0 0 4px rgba($color-gold, 0.12);
+  }
+}
+
+.error {
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}
+
+.success {
+  color: $color-success;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}

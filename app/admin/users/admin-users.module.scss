@@ -1,0 +1,19 @@
+@use "@/styles/variables" as *;
+
+.wrapper {
+  padding-top: calc(#{$height-header-desktop} + #{$space-4});
+  padding-bottom: $space-5;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: 800;
+  color: $color-text;
+  margin: 0 0 $space-1;
+}
+
+.subtitle {
+  color: $color-muted;
+  font-size: $font-size-sm;
+  margin: 0 0 $space-4;
+}

@@ -1,0 +1,222 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.tableWrapper {
+  @include glass-panel;
+  overflow-x: auto;
+  padding: $space-3;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: $space-2 $space-3;
+    border-bottom: 1px solid $color-border;
+    font-size: $font-size-sm;
+  }
+
+  th {
+    color: $color-muted;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+  }
+
+  td {
+    color: $color-text;
+  }
+}
+
+.empty {
+  text-align: center;
+  color: $color-muted;
+  padding: $space-4;
+}
+
+.roleBadge {
+  display: inline-block;
+  background: rgba($color-gold, 0.15);
+  color: $color-gold;
+  padding: 2px $space-2;
+  border-radius: $radius-base;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.actionsCell {
+  display: flex;
+  gap: $space-2;
+  white-space: nowrap;
+}
+
+.editButton,
+.deleteButton {
+  border: none;
+  background: none;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  padding: $space-1 $space-2;
+  border-radius: $radius-base;
+}
+
+.editButton {
+  color: $color-gold;
+
+  &:hover {
+    background: rgba($color-gold, 0.1);
+  }
+}
+
+.deleteButton {
+  color: $color-red;
+
+  &:hover {
+    background: rgba($color-red, 0.1);
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+  margin-top: $space-4;
+}
+
+.pageButton {
+  background: rgba($color-panel-soft, 0.7);
+  color: $color-text;
+  border: none;
+  padding: $space-2 $space-3;
+  border-radius: $radius-base;
+  cursor: pointer;
+  font-size: $font-size-sm;
+
+  &:hover:not(:disabled) {
+    background: rgba($color-panel-soft, 1);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pageInfo {
+  color: $color-muted;
+  font-size: $font-size-sm;
+}
+
+// Modal stilleri (Edit + Delete modal'ları için ortak)
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-bg, 0.9);
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.modalContent {
+  @include glass-panel;
+
+  width: 100%;
+  max-width: 480px;
+  padding: $space-4;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0 0 $space-2;
+}
+
+.modalDescription {
+  color: $color-muted;
+  font-size: $font-size-sm;
+  margin: 0 0 $space-3;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+}
+
+.selectField {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-bottom: $space-3;
+}
+
+.selectLabel {
+  font-size: 0.75rem;
+  color: rgba($color-text, 0.55);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: $radius-base;
+  padding: 13px $space-3;
+  color: $color-text;
+  font-size: $font-size-base;
+  height: $height-input;
+  transition: border-color $transition-fast, box-shadow $transition-fast,
+    background-color $transition-fast;
+
+  &:hover {
+    border-color: rgba($color-text, 0.18);
+  }
+
+  &:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba($color-gold, 0.6);
+    box-shadow: 0 0 0 4px rgba($color-gold, 0.12);
+  }
+}
+
+.error {
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-2;
+}
+
+.cancelButton {
+  background: transparent;
+  border: 1px solid $color-border;
+  color: $color-text;
+  font-weight: 600;
+  padding: $space-2 $space-4;
+  border-radius: $radius-base;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($color-text, 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

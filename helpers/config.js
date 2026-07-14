@@ -5,7 +5,15 @@
 
 const isBrowser = typeof window !== "undefined";
 
+
+
 export const config = {
+
+  tmdb: {
+  apiToken: process.env.TMDB_API_TOKEN,
+  imageBaseUrl: process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p",
+  },
+
   project: {
     name: "CineTime",
     slogan: "Pick your movie, choose your seat, enjoy the show",
@@ -13,7 +21,13 @@ export const config = {
   },
   apiURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081",
   roles: {
+    admin: "ROLE_ADMIN",
+    manager: "MANAGER",
+    customer: "ROLE_CUSTOMER",
+  },
+  roleNames: {
     admin: "ADMIN",
+    manager: "MANAGER",
     customer: "CUSTOMER",
   },
   userRightsOnRoutes: [
@@ -28,10 +42,15 @@ export const config = {
   // Ortam bilgisi
   isProduction: process.env.NODE_ENV === "production",
   isDevelopment: process.env.NODE_ENV === "development",
+
+  
 }
 
 if (!isBrowser && config.isProduction && !config.authSecret) {
   console.warn(
     "[config] AUTH_SECRET tanımlı değil. Production build'de bu zorunludur."
-  );  
+  ); 
+  
 };
+
+

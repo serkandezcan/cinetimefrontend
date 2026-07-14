@@ -5,6 +5,18 @@
   flex-direction: column;
 }
 
+.forgotPasswordLink {
+  align-self: flex-end;
+  color: $color-gold;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  margin-bottom: $space-3;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .formError {
   color: $color-red;
   font-size: $font-size-sm;

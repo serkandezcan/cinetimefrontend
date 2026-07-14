@@ -1,11 +1,12 @@
-import Hero from "@/components/home/Hero";
-import MovieStrip from "@/components/home/MovieStrip";
+
+
+
 
 export default function HomePage() {
   return (
-    <main>
-      <Hero />
-      <MovieStrip />
-    </main>
+    <div className="container" style={{ paddingTop: 100 }}>
+      <h1>CineTime</h1>
+      <p>Ana sayfa içeriği ilgili ekip arkadaşı tarafından eklenecek.</p>
+    </div>
   );
 }

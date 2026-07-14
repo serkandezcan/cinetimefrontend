@@ -16,7 +16,7 @@ export default auth(async (request) => {
     return NextResponse.redirect(new URL("/dashboard", origin));
   }
 
-  if (!isLoggedIn && (pathname.startsWith("/dashboard") || pathname.startsWith("/tickets") || pathname.startsWith("/bookings"))) {
+  if (!isLoggedIn && (pathname.startsWith("/dashboard") || pathname.startsWith("/tickets") || pathname.startsWith("/bookings") || pathname.startsWith("/account") || pathname.startsWith("/admin"))) {
     return NextResponse.redirect(new URL("/login", origin));
   }
 

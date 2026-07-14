@@ -1,6 +1,13 @@
+@use "sass:color";
+@use "./variables" as *;
+
 @mixin glass-panel {
-  background: rgba(17, 24, 39, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  background: rgba($color-panel, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba($color-text, 0.07);
+  border-radius: $radius-xl;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba($color-text, 0.05) inset;
 }

@@ -1,0 +1,187 @@
+@use "@/styles/variables" as *;
+
+.card {
+  width: 100%;
+  color: $color-text;
+}
+
+.posterWrapper {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: $radius-base;
+  overflow: hidden;
+  background-color: $color-panel;
+  margin-bottom: $space-2;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: scale(1.03);
+
+    .overlay {
+      opacity: 1;
+    }
+  }
+}
+
+.posterLink {
+  display: block;
+  height: 100%;
+}
+
+.poster {
+  object-fit: cover;
+}
+
+.posterFallback {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-3;
+  text-align: center;
+  color: $color-muted;
+  font-size: $font-size-sm;
+}
+
+// Hover'da beliren karartma + play/info + açıklama katmanı
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: $space-2;
+  padding: $space-3;
+  background: linear-gradient(
+    to top,
+    rgba($color-bg, 0.95) 0%,
+    rgba($color-bg, 0.5) 55%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity $transition-base;
+  pointer-events: none;
+
+  // Butonlar tıklanabilir olsun diye tekrar aç
+  .overlayActions,
+  .overviewText {
+    pointer-events: auto;
+  }
+}
+
+.overlayActions {
+  display: flex;
+  gap: $space-2;
+}
+
+.playButton,
+.infoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $height-sm;
+  height: $height-sm;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+}
+
+.playButton {
+  background-color: $color-text;
+  color: $color-bg;
+
+  &:hover {
+    background-color: rgba($color-text, 0.85);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.infoButton {
+  background-color: rgba($color-panel-soft, 0.8);
+  color: $color-text;
+
+  &:hover {
+    background-color: rgba($color-panel-soft, 1);
+  }
+}
+
+.overviewText {
+  font-size: $font-size-sm;
+  color: rgba($color-text, 0.85);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.titleLink {
+  color: $color-text;
+}
+
+.title {
+  font-size: $font-size-base;
+  font-weight: 700;
+  margin: 0 0 $space-1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: $color-muted;
+}
+
+.rating {
+  color: $color-gold;
+  font-weight: 700;
+}
+
+// Trailer modal — Hero'daki ile aynı görsel dil
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-bg, 0.9);
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.modalContent {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+}
+
+.modalIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: $radius-base;
+}
+
+.modalClose {
+  position: absolute;
+  top: -$space-5;
+  right: 0;
+  background: none;
+  border: none;
+  color: $color-text;
+  cursor: pointer;
+}
