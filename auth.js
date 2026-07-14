@@ -19,7 +19,31 @@ function decodeJwtExp(token) {
   }
 }
 
+/**
+ * Aynı refreshToken için eşzamanlı birden fazla yenileme isteği gitmesini
+ * önler — server component'ler paralel render olurken hepsi aynı anda
+ * "token süresi doldu" deyip refresh tetikleyebiliyor. Bu Map, aynı
+ * refreshToken için sadece TEK bir ağ isteği gitmesini garanti eder,
+ * diğer eşzamanlı çağrılar aynı promise'i bekler.
+ */
+const inFlightRefreshes = new Map();
+
 async function refreshAccessToken(token) {
+  const key = token.refreshToken;
+
+  if (inFlightRefreshes.has(key)) {
+    return inFlightRefreshes.get(key);
+  }
+
+  const promise = performRefresh(token).finally(() => {
+    inFlightRefreshes.delete(key);
+  });
+
+  inFlightRefreshes.set(key, promise);
+  return promise;
+}
+
+async function performRefresh(token) {
   try {
     const res = await fetch(
       `${appConfig.apiURL}${API_ROUTES.auth.refreshToken}`,
@@ -45,6 +69,8 @@ async function refreshAccessToken(token) {
     return {
       ...token,
       accessToken: data.accessToken,
+      // Bazı backend'ler refresh'te yeni refreshToken dönmeyebilir,
+      // dönmezse eskisini koru (rotation yoksa).
       refreshToken: data.refreshToken || token.refreshToken,
       accessTokenExpires: decodeJwtExp(data.accessToken),
       error: undefined,
@@ -109,6 +135,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // İlk login anı
       if (user) {
         return {
           ...token,
@@ -121,6 +148,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
       }
 
+      // Token hâlâ geçerliyse dokunma
       if (
         token.accessTokenExpires &&
         Date.now() < token.accessTokenExpires
@@ -128,11 +156,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return token;
       }
 
+      // Süresi dolmuş veya dolmak üzere — yenile
       return refreshAccessToken(token);
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken;
-      session.error = token.error;
+      session.error = token.error; // client bunu görüp gerekirse logout yapabilir
 
       if (session.user) {
         session.user.id = token.id;

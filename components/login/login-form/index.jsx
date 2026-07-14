@@ -2,25 +2,24 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import Input from "@/components/form-fields/input";
 import Button from "@/components/form-fields/button";
 import { loginSchema } from "@/helpers/schemas/auth-schema";
-import styles from "./login-form.module.scss";
 import { AUTH_MESSAGES } from "@/helpers/messages/auth-messages";
-
+import styles from "./login-form.module.scss";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const t = AUTH_MESSAGES.login;
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const t = AUTH_MESSAGES.login;
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -64,6 +63,7 @@ export default function LoginForm() {
       return;
     }
 
+    router.refresh(); // Header gibi server component'leri yeniler
     router.push(callbackUrl);
   }
 
@@ -88,6 +88,10 @@ export default function LoginForm() {
         onChange={handleChange}
         error={errors.password}
       />
+
+      <Link href="/forgot-password" className={styles.forgotPasswordLink}>
+        Şifremi unuttum
+      </Link>
 
       {formError && (
         <p className={styles.formError} role="alert">

@@ -1,0 +1,60 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.formCard {
+  @include glass-panel;
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  padding: $space-5;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $color-gold, transparent);
+    opacity: 0.7;
+  }
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: 800;
+  color: $color-text;
+  margin: 0 0 $space-1;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: rgba($color-text, 0.5);
+  font-size: $font-size-sm;
+  margin: 0 0 $space-5;
+}
+
+.loginPrompt {
+  text-align: center;
+  font-size: $font-size-sm;
+  color: rgba($color-text, 0.5);
+  margin-top: $space-4;
+}
+
+.loginLink {
+  color: $color-gold;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

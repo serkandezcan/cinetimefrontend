@@ -1,0 +1,99 @@
+@use "@/styles/variables" as *;
+@use "@/styles/mixins" as *;
+
+.section {
+  @include glass-panel;
+  padding: $space-4;
+  border: 1px solid rgba($color-red, 0.3);
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-red;
+  margin: 0 0 $space-2;
+}
+
+.description {
+  color: $color-muted;
+  font-size: $font-size-sm;
+  margin: 0 0 $space-3;
+}
+
+.triggerButton {
+  background: transparent;
+  border: 1px solid $color-red;
+  color: $color-red;
+  font-weight: 600;
+  padding: $space-2 $space-4;
+  border-radius: $radius-base;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: rgba($color-red, 0.1);
+  }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba($color-bg, 0.9);
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+}
+
+.modalContent {
+  @include glass-panel;
+
+  width: 100%;
+  max-width: 420px;
+  padding: $space-4;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0 0 $space-2;
+}
+
+.modalDescription {
+  color: $color-muted;
+  font-size: $font-size-sm;
+  margin: 0 0 $space-3;
+}
+
+.error {
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-2;
+}
+
+.cancelButton {
+  background: transparent;
+  border: 1px solid $color-border;
+  color: $color-text;
+  font-weight: 600;
+  padding: $space-2 $space-4;
+  border-radius: $radius-base;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($color-text, 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

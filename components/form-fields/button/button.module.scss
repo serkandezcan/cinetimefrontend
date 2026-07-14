@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "@/styles/variables" as *;
 
 .button {
@@ -6,36 +7,46 @@
   justify-content: center;
   gap: $space-2;
   width: 100%;
-  padding: $space-2 $space-4;
-  border-radius: $radius-base;
+  height: 48px;
+  padding: 0 $space-4;
+  border-radius: $radius-pill;
   font-size: $font-size-base;
-  font-weight: 600;
+  font-weight: 700;
   border: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  transition: transform $transition-fast, box-shadow $transition-base,
+    opacity $transition-fast;
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 
   &:not(:disabled):hover {
     transform: translateY(-1px);
   }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
 }
 
 .primary {
-  background: linear-gradient(135deg, $color-gold, darken($color-gold, 12%));
+  background: linear-gradient(135deg, $color-gold, color.adjust($color-gold, $lightness: -10%));
   color: $color-bg;
 
   &:not(:disabled):hover {
-    box-shadow: 0 6px 16px rgba($color-gold, 0.35);
+    box-shadow: 0 8px 24px rgba($color-gold, 0.4);
   }
 }
 
 .secondary {
-  background: transparent;
-  border: 1px solid $color-border;
+  background: rgba($color-text, 0.06);
+  border: 1px solid rgba($color-text, 0.12);
   color: $color-text;
+
+  &:not(:disabled):hover {
+    background: rgba($color-text, 0.1);
+  }
 }
 
 .spinner {
