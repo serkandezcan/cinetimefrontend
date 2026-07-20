@@ -1,0 +1,194 @@
+﻿@use "@/styles/variables" as *;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+  border-bottom: 1px solid rgba($color-text, 0.08);
+  background:
+    radial-gradient(circle at 10% 0%, rgba($color-gold, 0.16), transparent 32%),
+    rgba($color-bg, 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  width: min(100% - 32px, $container-max-width);
+  min-height: $height-header-desktop;
+  margin: 0 auto;
+}
+
+.brand,
+.profileLink,
+.logoutButton,
+.loginLink,
+.registerLink,
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand {
+  gap: $space-2;
+  color: $color-text;
+  font-weight: 900;
+  letter-spacing: $letter-spacing-tight;
+}
+
+.brandMark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba($color-gold, 0.38);
+  border-radius: 14px;
+  color: $color-bg;
+  background: linear-gradient(135deg, $color-gold, #ffe3a3);
+  box-shadow: 0 12px 30px rgba($color-gold, 0.18);
+}
+
+.brandText {
+  font-size: 1.25rem;
+
+  span {
+    color: $color-gold;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.navLink {
+  min-height: 40px;
+  padding: 0 $space-3;
+  border-radius: $radius-pill;
+  color: rgba($color-text, 0.72);
+  font-weight: 700;
+  transition: color $transition-base, background $transition-base;
+
+  &:hover,
+  &.active {
+    color: $color-text;
+    background: rgba($color-text, 0.08);
+  }
+
+  &.active {
+    box-shadow: inset 0 0 0 1px rgba($color-gold, 0.28);
+  }
+}
+
+.userArea {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 190px;
+}
+
+.authLinks,
+.profileActions {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.loginLink,
+.profileLink,
+.logoutButton,
+.loadingPill {
+  min-height: 40px;
+  padding: 0 $space-3;
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: $radius-pill;
+  color: rgba($color-text, 0.78);
+  background: rgba($color-text, 0.04);
+  font-weight: 800;
+}
+
+.registerLink {
+  min-height: 42px;
+  padding: 0 $space-3;
+  border-radius: $radius-pill;
+  color: $color-bg;
+  background: $color-gold;
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba($color-gold, 0.22);
+}
+
+.logoutButton {
+  gap: 6px;
+  border: 0;
+  cursor: pointer;
+}
+
+.profileLink {
+  gap: 6px;
+}
+
+.menuButton {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba($color-text, 0.12);
+  border-radius: 14px;
+  color: $color-text;
+  background: rgba($color-text, 0.06);
+}
+
+@media (max-width: $breakpoint-lg) {
+  .inner {
+    flex-wrap: wrap;
+    min-height: $height-header-mobile;
+    padding: $space-2 0;
+  }
+
+  .menuButton {
+    display: grid;
+    order: 3;
+  }
+
+  .userArea {
+    order: 2;
+    min-width: auto;
+  }
+
+  .nav {
+    display: none;
+    order: 4;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    padding: $space-2 0;
+  }
+
+  .navOpen {
+    display: flex;
+  }
+
+  .navLink {
+    justify-content: center;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .brandText,
+  .profileLink span,
+  .logoutButton span {
+    display: none;
+  }
+
+  .authLinks {
+    gap: 6px;
+  }
+
+  .loginLink,
+  .registerLink {
+    padding: 0 $space-2;
+  }
+}

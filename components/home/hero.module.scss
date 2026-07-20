@@ -1,0 +1,167 @@
+﻿@use "@/styles/variables" as *;
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  width: min(100% - 32px, $container-max-width);
+  min-height: calc(100svh - #{$height-header-desktop});
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 7rem) 0;
+
+  &::before {
+    position: absolute;
+    inset: 6% auto auto -18%;
+    width: 420px;
+    height: 420px;
+    content: "";
+    background: radial-gradient(circle, rgba($color-gold, 0.18), transparent 68%);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+
+  h1 {
+    max-width: 780px;
+    margin: $space-3 0;
+    color: $color-text;
+    font-size: clamp(3rem, 8vw, 6.7rem);
+    font-weight: 950;
+    letter-spacing: -0.075em;
+    line-height: 0.92;
+  }
+
+  p {
+    max-width: 650px;
+    color: rgba($color-text, 0.7);
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.75;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin: $space-4 0;
+}
+
+.trustRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  color: rgba($color-text, 0.58);
+  font-size: 0.95rem;
+
+  span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $color-gold;
+  }
+}
+
+.posterStage {
+  position: relative;
+  display: grid;
+  gap: $space-3;
+}
+
+.posterCard {
+  position: relative;
+  min-height: 460px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  overflow: hidden;
+  border: 1px solid rgba($color-text, 0.09);
+  border-radius: 40px;
+  background:
+    linear-gradient(145deg, rgba($color-gold, 0.22), transparent 34%),
+    radial-gradient(circle at 80% 20%, rgba($color-blue, 0.2), transparent 24%),
+    linear-gradient(150deg, #20100f, #0d1728 55%, #07111f);
+  box-shadow: 0 42px 100px rgba(0, 0, 0, 0.36);
+
+  &::after {
+    position: absolute;
+    right: -60px;
+    bottom: -60px;
+    width: 260px;
+    height: 260px;
+    content: "";
+    border: 1px solid rgba($color-gold, 0.26);
+    border-radius: 50%;
+  }
+
+  h2 {
+    max-width: 380px;
+    margin: $space-3 0 $space-2;
+    color: $color-text;
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    font-weight: 950;
+    letter-spacing: -0.06em;
+    line-height: 0.96;
+  }
+
+  p {
+    max-width: 320px;
+    color: rgba($color-text, 0.68);
+    line-height: 1.65;
+  }
+}
+
+.posterTopline {
+  display: inline-flex;
+  padding: 8px 12px;
+  border: 1px solid rgba($color-text, 0.12);
+  border-radius: $radius-pill;
+  color: $color-gold;
+  background: rgba($color-bg, 0.38);
+  font-weight: 900;
+}
+
+.playButton {
+  position: absolute;
+  right: 32px;
+  bottom: 32px;
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: $color-bg;
+  background: $color-gold;
+  box-shadow: 0 18px 36px rgba($color-gold, 0.25);
+}
+
+.seatMiniMap {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  padding: $space-3;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 26px;
+  background: rgba($color-panel, 0.62);
+
+  span {
+    height: 22px;
+    border-radius: 8px 8px 14px 14px;
+    background: rgba($color-text, 0.18);
+  }
+}
+
+.booked {
+  background: $color-gold !important;
+}
+
+@media (max-width: $breakpoint-lg) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}

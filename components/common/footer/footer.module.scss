@@ -1,0 +1,124 @@
+﻿@use "@/styles/variables" as *;
+
+.footer {
+  border-top: 1px solid rgba($color-text, 0.08);
+  background:
+    radial-gradient(circle at 100% 0%, rgba($color-red, 0.16), transparent 28%),
+    linear-gradient(180deg, rgba($color-panel, 0.68), rgba($color-bg, 0.96));
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.1fr) 2fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: 56px 0 36px;
+}
+
+.brandColumn p {
+  max-width: 360px;
+  margin: $space-3 0 $space-4;
+  color: rgba($color-text, 0.68);
+  line-height: 1.7;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.brandMark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 14px;
+  color: $color-bg;
+  background: $color-gold;
+}
+
+.socials {
+  display: flex;
+  gap: $space-2;
+
+  a {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid rgba($color-text, 0.1);
+    border-radius: 50%;
+    color: $color-text;
+    background: rgba($color-text, 0.05);
+    transition: transform $transition-base, border-color $transition-base;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: rgba($color-gold, 0.5);
+    }
+  }
+}
+
+.linkGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-4;
+}
+
+.linkGroup {
+  h2 {
+    margin-bottom: $space-3;
+    color: $color-gold;
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  a {
+    display: block;
+    margin-bottom: $space-2;
+    color: rgba($color-text, 0.68);
+    text-decoration: none;
+    transition: color $transition-base;
+
+    &:hover {
+      color: $color-text;
+    }
+  }
+}
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-3;
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: $space-3 0 $space-4;
+  border-top: 1px solid rgba($color-text, 0.08);
+  color: rgba($color-text, 0.48);
+  font-size: 0.875rem;
+}
+
+@media (max-width: $breakpoint-lg) {
+  .inner,
+  .linkGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .linkGrid {
+    gap: $space-3;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .bottomBar {
+    flex-direction: column;
+  }
+}
