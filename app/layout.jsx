@@ -16,7 +16,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>
         <SessionProvider>
           <a className="ct-skip-link" href="#main-content">
@@ -32,3 +32,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+

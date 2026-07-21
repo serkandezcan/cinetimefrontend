@@ -40,7 +40,7 @@ export default function Footer() {
             <div key={group.title} className={styles.linkGroup}>
               <h2>{group.title}</h2>
               {group.links.map((item) => (
-                <Link key={item.href} href={item.href}>
+                <Link key={`${group.title}-${item.label}`} href={item.href}>
                   {item.label}
                 </Link>
               ))}
@@ -56,4 +56,5 @@ export default function Footer() {
     </footer>
   );
 }
+
 
