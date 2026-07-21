@@ -1,6 +1,7 @@
-import { SessionProvider } from "next-auth/react";
+﻿import { SessionProvider } from "next-auth/react";
 import { config } from "@/helpers/config";
-import TempLogoutButton from "@/components/temp/TempLogoutButton";
+import MainMenu from "@/components/common/header/MainMenu";
+import Footer from "@/components/common/footer/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "primeicons/primeicons.css";
 import "@/styles/index.scss";
@@ -11,7 +12,6 @@ export const metadata = {
     default: `${config.project.name} - ${config.project.slogan}`,
   },
   description: config.project.description,
-  
 };
 
 export default function RootLayout({ children }) {
@@ -19,8 +19,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <SessionProvider>
-          <TempLogoutButton />
-          {children}
+          <a className="ct-skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <MainMenu />
+          <main id="main-content" className="ct-main-shell">
+            {children}
+          </main>
+          <Footer />
         </SessionProvider>
       </body>
     </html>
