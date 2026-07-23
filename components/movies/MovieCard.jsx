@@ -1,115 +1,52 @@
-"use client";
-
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Play, Info, X } from "lucide-react";
+﻿import Link from "next/link";
+import { CalendarDays, Clock3, Star } from "lucide-react";
+import { getMovieStatusLabel } from "@/services/movie-service";
 import styles from "./movie-card.module.scss";
 
 export default function MovieCard({ movie }) {
-  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
-  const [trailerKey, setTrailerKey] = useState(null);
-  const [isLoadingTrailer, setIsLoadingTrailer] = useState(false);
-
-  async function handlePlayClick() {
-    if (trailerKey) {
-      setIsTrailerOpen(true);
-      return;
-    }
-
-    setIsLoadingTrailer(true);
-    try {
-      const res = await fetch(`/api/movies/${movie.id}/trailer`);
-      const data = await res.json();
-      if (data.key) {
-        setTrailerKey(data.key);
-        setIsTrailerOpen(true);
-      }
-    } finally {
-      setIsLoadingTrailer(false);
-    }
-  }
+  const statusLabel = getMovieStatusLabel(movie.status);
+  const releaseYear = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : null;
+  const castPreview = Array.isArray(movie.cast) ? movie.cast.slice(0, 2).join(", ") : "";
 
   return (
-    <div className={styles.card}>
-      <div className={styles.posterWrapper}>
-        <Link href={`/movies/${movie.id}`} className={styles.posterLink}>
-          {movie.posterUrl ? (
-            <Image
-              src={movie.posterUrl}
-              alt={movie.title}
-              fill
-              sizes="(max-width: 768px) 45vw, 220px"
-              className={styles.poster}
-            />
-          ) : (
-            <div className={styles.posterFallback}>{movie.title}</div>
-          )}
-        </Link>
-
-        <div className={styles.overlay}>
-          <div className={styles.overlayActions}>
-            <button
-              type="button"
-              className={styles.playButton}
-              onClick={handlePlayClick}
-              disabled={isLoadingTrailer}
-              aria-label="Fragmanı izle"
-            >
-              <Play size={16} fill="currentColor" />
-            </button>
-            <Link
-              href={`/movies/${movie.id}`}
-              className={styles.infoButton}
-              aria-label="Daha fazla bilgi"
-            >
-              <Info size={16} />
-            </Link>
+    <article className={styles.card}>
+      <Link href={`/movies/${movie.id}`} className={styles.posterLink} aria-label={`${movie.title} detayina git`}>
+        <div className={styles.posterWrapper}>
+          <div className={styles.posterFallback}>
+            <span>{movie.genre || "CineTime"}</span>
+            <strong>{movie.title}</strong>
           </div>
-
-          {movie.overview && (
-            <p className={styles.overviewText}>{movie.overview}</p>
-          )}
+          <span className={styles.statusBadge}>{statusLabel}</span>
         </div>
-      </div>
-
-      <Link href={`/movies/${movie.id}`} className={styles.titleLink}>
-        <h3 className={styles.title}>{movie.title}</h3>
       </Link>
 
-      <div className={styles.meta}>
-        {movie.rating && <span className={styles.rating}>★ {movie.rating}</span>}
-        {movie.year && <span>{movie.year}</span>}
-        {movie.genreNames && <span>{movie.genreNames}</span>}
-      </div>
+      <div className={styles.body}>
+        <Link href={`/movies/${movie.id}`} className={styles.titleLink}>
+          <h2 className={styles.title}>{movie.title}</h2>
+        </Link>
 
-      {isTrailerOpen && trailerKey && (
-        <div
-          className={styles.modalBackdrop}
-          onClick={() => setIsTrailerOpen(false)}
-        >
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              className={styles.modalClose}
-              onClick={() => setIsTrailerOpen(false)}
-              aria-label="Kapat"
-            >
-              <X size={24} />
-            </button>
-            <iframe
-              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
-              title="Fragman"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              className={styles.modalIframe}
-            />
-          </div>
+        <p className={styles.summary}>{movie.summary || "Film ozeti yakinda eklenecek."}</p>
+
+        <div className={styles.metaGrid}>
+          {releaseYear && (
+            <span>
+              <CalendarDays size={15} /> {releaseYear}
+            </span>
+          )}
+          {movie.duration ? (
+            <span>
+              <Clock3 size={15} /> {movie.duration} dk
+            </span>
+          ) : null}
+          {movie.rating ? (
+            <span className={styles.rating}>
+              <Star size={15} fill="currentColor" /> {movie.rating}
+            </span>
+          ) : null}
         </div>
-      )}
-    </div>
+
+        {castPreview && <p className={styles.cast}>Oyuncular: {castPreview}</p>}
+      </div>
+    </article>
   );
 }

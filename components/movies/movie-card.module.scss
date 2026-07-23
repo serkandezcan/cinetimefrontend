@@ -1,187 +1,131 @@
-@use "@/styles/variables" as *;
+﻿@use "@/styles/variables" as *;
 
 .card {
-  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 28px;
   color: $color-text;
+  background:
+    linear-gradient(145deg, rgba($color-text, 0.08), rgba($color-text, 0.02)),
+    rgba($color-panel, 0.66);
+  transition: transform $transition-base, border-color $transition-base;
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba($color-gold, 0.42);
+  }
+}
+
+.posterLink,
+.titleLink {
+  color: inherit;
+  text-decoration: none;
 }
 
 .posterWrapper {
   position: relative;
-  aspect-ratio: 2 / 3;
-  border-radius: $radius-base;
+  min-height: 280px;
+  padding: $space-3;
   overflow: hidden;
-  background-color: $color-panel;
-  margin-bottom: $space-2;
-  transition: transform $transition-base;
+  background:
+    radial-gradient(circle at 30% 20%, rgba($color-gold, 0.32), transparent 34%),
+    linear-gradient(145deg, #24120f, #0c1828 62%, #07111f);
 
-  &:hover {
-    transform: scale(1.03);
-
-    .overlay {
-      opacity: 1;
-    }
+  &::after {
+    position: absolute;
+    right: -52px;
+    bottom: -74px;
+    width: 190px;
+    height: 190px;
+    content: "";
+    border: 1px solid rgba($color-gold, 0.24);
+    border-radius: 50%;
   }
-}
-
-.posterLink {
-  display: block;
-  height: 100%;
-}
-
-.poster {
-  object-fit: cover;
 }
 
 .posterFallback {
-  height: 100%;
+  position: relative;
+  z-index: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $space-3;
-  text-align: center;
-  color: $color-muted;
-  font-size: $font-size-sm;
-}
-
-// Hover'da beliren karartma + play/info + açıklama katmanı
-.overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
+  min-height: 246px;
   flex-direction: column;
   justify-content: flex-end;
   gap: $space-2;
+
+  span {
+    color: $color-gold;
+    font-size: 0.78rem;
+    font-weight: 950;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: $color-text;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 950;
+    letter-spacing: -0.055em;
+    line-height: 0.95;
+  }
+}
+
+.statusBadge {
+  position: absolute;
+  top: $space-3;
+  right: $space-3;
+  z-index: 2;
+  padding: 7px 11px;
+  border: 1px solid rgba($color-text, 0.12);
+  border-radius: $radius-pill;
+  color: $color-text;
+  background: rgba($color-bg, 0.56);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.body {
   padding: $space-3;
-  background: linear-gradient(
-    to top,
-    rgba($color-bg, 0.95) 0%,
-    rgba($color-bg, 0.5) 55%,
-    transparent 100%
-  );
-  opacity: 0;
-  transition: opacity $transition-base;
-  pointer-events: none;
-
-  // Butonlar tıklanabilir olsun diye tekrar aç
-  .overlayActions,
-  .overviewText {
-    pointer-events: auto;
-  }
-}
-
-.overlayActions {
-  display: flex;
-  gap: $space-2;
-}
-
-.playButton,
-.infoButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: $height-sm;
-  height: $height-sm;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  transition: transform $transition-fast, background-color $transition-fast;
-
-  &:hover {
-    transform: scale(1.08);
-  }
-}
-
-.playButton {
-  background-color: $color-text;
-  color: $color-bg;
-
-  &:hover {
-    background-color: rgba($color-text, 0.85);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: wait;
-  }
-}
-
-.infoButton {
-  background-color: rgba($color-panel-soft, 0.8);
-  color: $color-text;
-
-  &:hover {
-    background-color: rgba($color-panel-soft, 1);
-  }
-}
-
-.overviewText {
-  font-size: $font-size-sm;
-  color: rgba($color-text, 0.85);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.titleLink {
-  color: $color-text;
 }
 
 .title {
-  font-size: $font-size-base;
-  font-weight: 700;
-  margin: 0 0 $space-1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin: 0 0 $space-2;
+  font-size: 1.35rem;
+  font-weight: 950;
+  letter-spacing: -0.035em;
 }
 
-.meta {
+.summary {
+  display: -webkit-box;
+  min-height: 3.4em;
+  margin-bottom: $space-3;
+  overflow: hidden;
+  color: rgba($color-text, 0.64);
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.metaGrid {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: $space-2;
-  font-size: $font-size-sm;
-  color: $color-muted;
+  color: rgba($color-text, 0.62);
+  font-size: 0.9rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
 }
 
 .rating {
   color: $color-gold;
-  font-weight: 700;
+  font-weight: 900;
 }
 
-// Trailer modal — Hero'daki ile aynı görsel dil
-.modalBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba($color-bg, 0.9);
-  z-index: $z-modal;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $space-4;
-}
-
-.modalContent {
-  position: relative;
-  width: 100%;
-  max-width: 960px;
-  aspect-ratio: 16 / 9;
-}
-
-.modalIframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: $radius-base;
-}
-
-.modalClose {
-  position: absolute;
-  top: -$space-5;
-  right: 0;
-  background: none;
-  border: none;
-  color: $color-text;
-  cursor: pointer;
+.cast {
+  margin: $space-3 0 0;
+  color: rgba($color-text, 0.46);
+  font-size: 0.9rem;
 }

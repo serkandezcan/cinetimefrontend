@@ -1,0 +1,128 @@
+﻿@use "@/styles/variables" as *;
+
+.page {
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 0;
+}
+
+.header {
+  max-width: 720px;
+  margin-bottom: $space-4;
+
+  h1 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 950;
+    letter-spacing: -0.075em;
+    line-height: 0.92;
+  }
+
+  p {
+    color: rgba($color-text, 0.68);
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  margin-bottom: $space-4;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: $space-2;
+  min-height: 52px;
+  padding: 0 $space-3;
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: $radius-pill;
+  color: rgba($color-text, 0.68);
+  background: rgba($color-panel, 0.62);
+
+  input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    color: $color-text;
+    background: transparent;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+
+  button {
+    min-height: 44px;
+    padding: 0 $space-3;
+    border: 1px solid rgba($color-text, 0.1);
+    border-radius: $radius-pill;
+    color: rgba($color-text, 0.72);
+    background: rgba($color-text, 0.04);
+    font-weight: 900;
+  }
+}
+
+.activeFilter {
+  color: $color-bg !important;
+  background: $color-gold !important;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-3;
+}
+
+.stateBox {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  gap: $space-2;
+  padding: $space-4;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 28px;
+  color: rgba($color-text, 0.74);
+  background: rgba($color-panel, 0.62);
+  text-align: center;
+
+  strong {
+    color: $color-text;
+  }
+
+  button,
+  a {
+    border: 0;
+    border-radius: $radius-pill;
+    padding: 10px 16px;
+    color: $color-bg;
+    background: $color-gold;
+    font-weight: 900;
+    text-decoration: none;
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
