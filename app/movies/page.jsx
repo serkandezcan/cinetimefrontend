@@ -1,7 +1,7 @@
-import PageHeader from "@/components/common/page-header/PageHeader";
+﻿import MovieList from "@/components/movies/MovieList";
 
 export const metadata = { title: "Movies" };
 
-export default function Page() {
-  return <PageHeader title="Movies" description="This page will be implemented step by step." />;
+export default function MoviesPage() {
+  return <MovieList />;
 }

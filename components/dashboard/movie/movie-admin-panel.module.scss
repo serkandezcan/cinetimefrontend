@@ -1,0 +1,87 @@
+﻿@use "@/styles/variables" as *;
+
+.page {
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 0;
+}
+
+.header {
+  max-width: 760px;
+  margin-bottom: $space-4;
+
+  h1 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    font-weight: 950;
+    letter-spacing: -0.07em;
+  }
+
+  p {
+    color: rgba($color-text, 0.68);
+  }
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-3;
+  padding: $space-4;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 32px;
+  background: rgba($color-panel, 0.66);
+
+  label {
+    display: grid;
+    gap: 8px;
+    color: rgba($color-text, 0.68);
+    font-size: 0.9rem;
+    font-weight: 900;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    border: 1px solid rgba($color-text, 0.1);
+    border-radius: 16px;
+    padding: 13px 14px;
+    color: $color-text;
+    background: rgba($color-bg, 0.52);
+    outline: 0;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+.success,
+.error {
+  margin: 0 0 $space-2;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-weight: 900;
+}
+
+.success {
+  color: #092116;
+  background: rgba($color-success, 0.9);
+}
+
+.error {
+  color: $color-text;
+  background: rgba($color-danger, 0.36);
+}
+
+@media (max-width: $breakpoint-md) {
+  .form {
+    grid-template-columns: 1fr;
+    padding: $space-3;
+  }
+}

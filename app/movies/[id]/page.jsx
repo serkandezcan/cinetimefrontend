@@ -1,7 +1,9 @@
-import PageHeader from "@/components/common/page-header/PageHeader";
+﻿import MovieDetail from "@/components/movies/MovieDetail";
 
 export const metadata = { title: "Movie Detail" };
 
-export default function MovieDetailPage() {
-  return <PageHeader title="Movie Detail" description="Movie detail will be connected to GET /api/movies/{id}." />;
+export default async function MovieDetailPage({ params }) {
+  const { id } = await params;
+
+  return <MovieDetail movieId={id} />;
 }
