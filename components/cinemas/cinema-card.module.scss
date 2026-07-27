@@ -1,0 +1,38 @@
+@use "@/styles/variables" as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  transition: transform $transition-fast, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.name {
+  color: $color-text;
+  font-size: $font-size-lg;
+  font-weight: 700;
+  margin: 0;
+}
+
+.location {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin: 0;
+}
+
+.address {
+  color: $color-text;
+  font-size: $font-size-sm;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.phone {
+  color: $color-blue;
+  font-size: $font-size-sm;
+  margin: 0;
+}
