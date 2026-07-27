@@ -1,0 +1,84 @@
+@use "@/styles/variables" as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+  margin-bottom: $space-5;
+}
+
+.title {
+  color: $color-text;
+  font-size: $font-size-xl;
+  font-weight: 700;
+  margin-bottom: $space-3;
+}
+
+.selectField {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-bottom: $space-3;
+}
+
+.selectLabel {
+  font-size: $font-size-sm;
+  color: $color-muted;
+  font-weight: 500;
+}
+
+.select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $color-border;
+  border-radius: $radius-base;
+  padding: $space-2 $space-3;
+  color: $color-text;
+  font-size: $font-size-base;
+  height: $height-input;
+
+  &:focus {
+    outline: none;
+    border-color: $color-gold;
+    box-shadow: 0 0 0 3px rgba($color-gold, 0.15);
+  }
+}
+
+.selectError {
+  font-size: $font-size-sm;
+  color: $color-red;
+}
+
+.formError {
+  color: $color-red;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}
+
+.formSuccess {
+  color: $color-success;
+  font-size: $font-size-sm;
+  margin-bottom: $space-3;
+}
+
+.summary {
+  background: rgba($color-gold, 0.08);
+  border: 1px solid rgba($color-gold, 0.35);
+  border-radius: $radius-base;
+  padding: $space-3;
+  margin-bottom: $space-3;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+
+  p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    color: $color-text;
+    font-size: $font-size-sm;
+  }
+
+  span {
+    color: $color-text-muted;
+  }
+}

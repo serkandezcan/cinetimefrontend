@@ -41,7 +41,24 @@ export const VALIDATION_MESSAGES = {
   currentPassword: {
     required: "Mevcut şifre zorunlu.",
   },
-  
+
+  cinema: {
+    name: { required: "Sinema adı zorunlu." },
+    city: { required: "Şehir zorunlu." },
+    district: { required: "İlçe zorunlu." },
+    address: { required: "Adres zorunlu." },
+    phone: {
+      required: "Telefon zorunlu.",
+      invalid: "Geçerli bir telefon numarası girin.",
+    },
+  },
+  hall: {
+    cinemaId: { required: "Sinema seçilmeli." },
+    name: { required: "Salon adı zorunlu." },
+    hallType: { required: "Salon tipi seçilmeli." },
+    rows: { invalid: "Sıra sayısı pozitif bir tam sayı olmalı." },
+    seatsPerRow: { invalid: "Koltuk sayısı pozitif bir tam sayı olmalı." },
+  },
 };
 
 export default VALIDATION_MESSAGES;
