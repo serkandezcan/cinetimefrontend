@@ -1,0 +1,91 @@
+﻿@use "@/styles/variables" as *;
+
+.page {
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 0;
+}
+
+.header {
+  max-width: 780px;
+  margin-bottom: $space-4;
+
+  h1 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 950;
+    letter-spacing: -0.075em;
+    line-height: 0.92;
+  }
+
+  p {
+    color: rgba($color-text, 0.68);
+    font-size: 1.08rem;
+    line-height: 1.7;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $space-3;
+}
+
+.card {
+  min-height: 240px;
+  padding: $space-4;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 28px;
+  color: $color-text;
+  background:
+    linear-gradient(145deg, rgba($color-text, 0.08), rgba($color-text, 0.02)),
+    rgba($color-panel, 0.66);
+  text-decoration: none;
+  transition: transform $transition-base, border-color $transition-base, background $transition-base;
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba($color-gold, 0.42);
+    background:
+      linear-gradient(145deg, rgba($color-gold, 0.16), rgba($color-text, 0.03)),
+      rgba($color-panel, 0.74);
+  }
+
+  strong {
+    display: block;
+    margin: $space-3 0 $space-2;
+    font-size: 1.35rem;
+    font-weight: 950;
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-text, 0.62);
+    line-height: 1.65;
+  }
+}
+
+.iconWrap {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 18px;
+  color: $color-bg;
+  background: $color-gold;
+  box-shadow: 0 16px 34px rgba($color-gold, 0.2);
+}
+
+@media (max-width: $breakpoint-lg) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
