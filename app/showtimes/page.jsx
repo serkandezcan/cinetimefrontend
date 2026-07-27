@@ -1,7 +1,7 @@
-import PageHeader from "@/components/common/page-header/PageHeader";
+﻿import ShowtimeList from "@/components/showtimes/ShowtimeList";
 
 export const metadata = { title: "Showtimes" };
 
-export default function Page() {
-  return <PageHeader title="Showtimes" description="This page will be implemented step by step." />;
+export default function ShowtimesPage() {
+  return <ShowtimeList />;
 }
