@@ -1,7 +1,9 @@
-import PageHeader from "@/components/common/page-header/PageHeader";
+import SeatSelectionClient from "@/components/booking/SeatSelectionClient";
 
 export const metadata = { title: "Seat Selection" };
 
-export default function SeatSelectionPage() {
-  return <PageHeader title="Seat Selection" description="Seat map will be connected to GET /showtimes/{id}/seats." />;
+export default async function SeatSelectionPage({ params }) {
+  const { id } = await params;
+
+  return <SeatSelectionClient showtimeId={id} />;
 }

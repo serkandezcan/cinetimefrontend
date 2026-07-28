@@ -1,0 +1,381 @@
+@use "@/styles/variables" as *;
+
+.page {
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: $space-4;
+  color: $color-gold;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.header {
+  max-width: 860px;
+  margin-bottom: $space-4;
+
+  h1 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 950;
+    letter-spacing: -0.075em;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-text, 0.72);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: $space-4;
+  align-items: start;
+}
+
+.mapPanel,
+.summaryPanel,
+.successPanel,
+.stateBox {
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba($color-gold, 0.12), transparent 28%),
+    rgba($color-panel, 0.72);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.mapPanel {
+  overflow-x: auto;
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.screen {
+  width: min(78%, 620px);
+  min-height: 20px;
+  margin: 0 auto $space-5;
+  border-radius: 0 0 999px 999px;
+  color: rgba($color-bg, 0.9);
+  background: linear-gradient(90deg, rgba($color-text, 0.38), $color-text, rgba($color-text, 0.38));
+  box-shadow: 0 22px 42px rgba($color-gold, 0.2);
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.24em;
+  line-height: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.seatMap {
+  display: grid;
+  gap: 12px;
+  min-width: 560px;
+}
+
+.seatRow {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: $space-2;
+  align-items: center;
+}
+
+.rowLabel {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  color: rgba($color-text, 0.76);
+  background: rgba($color-text, 0.07);
+  font-weight: 950;
+}
+
+.seatCells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.seat {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba($color-text, 0.12);
+  border-radius: 13px 13px 18px 18px;
+  color: $color-text;
+  background: rgba($color-panel-soft, 0.78);
+  cursor: pointer;
+  font-weight: 950;
+  transition: transform $transition-fast, border-color $transition-fast, background $transition-fast;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: rgba($color-gold, 0.55);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.selectedSeat {
+  color: #1c1300;
+  border-color: $color-gold;
+  background: $color-gold;
+}
+
+.bookedSeat {
+  color: rgba($color-text, 0.36);
+  border-color: rgba($color-danger, 0.18);
+  background: rgba($color-danger, 0.18);
+}
+
+.premiumSeat:not(.selectedSeat):not(.bookedSeat) {
+  border-color: rgba($color-blue, 0.46);
+  background: rgba($color-blue, 0.14);
+}
+
+.disabledSeat:not(.selectedSeat) {
+  border-style: dashed;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-top: $space-4;
+  color: rgba($color-text, 0.72);
+  font-weight: 850;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  i {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 5px 5px 7px 7px;
+  }
+}
+
+.legendAvailable {
+  background: rgba($color-panel-soft, 0.95);
+  border: 1px solid rgba($color-text, 0.16);
+}
+
+.legendSelected {
+  background: $color-gold;
+}
+
+.legendBooked {
+  background: rgba($color-danger, 0.4);
+}
+
+.legendPremium {
+  background: rgba($color-blue, 0.32);
+}
+
+.summaryPanel {
+  display: grid;
+  gap: $space-3;
+  padding: $space-4;
+  position: sticky;
+  top: calc($header-height + 24px);
+
+  h2 {
+    margin: 0;
+    color: $color-text;
+    font-size: 2rem;
+    font-weight: 950;
+    letter-spacing: -0.055em;
+  }
+}
+
+.summaryFacts {
+  display: grid;
+  gap: 10px;
+
+  p {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 13px 14px;
+    border: 1px solid rgba($color-text, 0.08);
+    border-radius: 18px;
+    background: rgba($color-bg, 0.34);
+  }
+
+  span {
+    color: rgba($color-text, 0.58);
+    font-size: 0.82rem;
+    font-weight: 850;
+  }
+
+  strong {
+    color: $color-text;
+  }
+}
+
+.selectedList {
+  display: grid;
+  gap: 10px;
+
+  > strong {
+    color: $color-text;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($color-text, 0.58);
+  }
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  span {
+    padding: 8px 11px;
+    border-radius: $radius-pill;
+    color: #1c1300;
+    background: $color-gold;
+    font-size: 0.85rem;
+    font-weight: 950;
+  }
+}
+
+.totalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  padding-top: $space-3;
+  border-top: 1px solid rgba($color-text, 0.1);
+  color: rgba($color-text, 0.72);
+
+  strong {
+    color: $color-gold;
+    font-size: 1.55rem;
+  }
+}
+
+.error,
+.success {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-weight: 900;
+}
+
+.error {
+  color: $color-text;
+  background: rgba($color-danger, 0.28);
+}
+
+.success {
+  color: #081e13;
+  background: rgba($color-success, 0.9);
+}
+
+.bookingResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  padding: 12px 14px;
+  border-radius: 18px;
+  color: #081e13;
+  background: rgba($color-success, 0.92);
+  font-weight: 950;
+}
+
+.refreshButton,
+.stateBox button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: $radius-pill;
+  color: $color-text;
+  background: rgba($color-text, 0.06);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.stateBox {
+  display: grid;
+  gap: $space-2;
+  min-height: 220px;
+  place-items: center;
+  padding: $space-4;
+  color: rgba($color-text, 0.72);
+  text-align: center;
+
+  strong {
+    color: $color-text;
+    font-size: 1.2rem;
+  }
+
+  span {
+    max-width: 520px;
+  }
+}
+
+.successPanel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: $space-4;
+  padding: 14px 16px;
+  color: $color-text;
+  font-weight: 900;
+}
+
+@media (max-width: $breakpoint-lg) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryPanel {
+    position: static;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .page {
+    width: min(100% - 22px, $container-max-width);
+    padding-top: $space-5;
+  }
+
+  .mapPanel,
+  .summaryPanel,
+  .successPanel,
+  .stateBox {
+    border-radius: 24px;
+  }
+
+  .seatMap {
+    min-width: 480px;
+  }
+
+  .seat {
+    width: 38px;
+    height: 38px;
+  }
+}
