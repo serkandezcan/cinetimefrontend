@@ -1,13 +1,32 @@
-import { CUSTOMER_BOOKINGS_API, CUSTOMER_PAYMENT_API } from "@/helpers/api-routes";
-import { request } from "./api-client";
+import { API_ROUTES } from "@/helpers/api-routes";
+import { apiClient } from "@/services/api-client";
 
-export const createBooking = async (payload, token) => request(CUSTOMER_BOOKINGS_API, {
-  method: "POST",
-  headers: { Authorization: `Bearer ${token}` },
-  body: JSON.stringify(payload),
-});
+export async function createBooking(payload, token) {
+  return apiClient.post(API_ROUTES.bookings.create, payload, { token });
+}
 
-export const completePayment = async (bookingId, token) => request(CUSTOMER_PAYMENT_API(bookingId), {
-  method: "POST",
-  headers: { Authorization: `Bearer ${token}` },
-});
+export async function getMyBookings(token) {
+  return apiClient.get(API_ROUTES.bookings.list, { token });
+}
+
+export async function getBookingById(bookingId, token) {
+  return apiClient.get(API_ROUTES.bookings.detail(bookingId), { token });
+}
+
+export async function cancelBooking(bookingId, token) {
+  return apiClient.patch(API_ROUTES.bookings.cancel(bookingId), undefined, { token });
+}
+
+export async function completePayment(bookingId, token) {
+  return apiClient.post(API_ROUTES.bookings.pay(bookingId), {}, { token });
+}
+
+const bookingService = {
+  createBooking,
+  getMyBookings,
+  getBookingById,
+  cancelBooking,
+  completePayment,
+};
+
+export default bookingService;
