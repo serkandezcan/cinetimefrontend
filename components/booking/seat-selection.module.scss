@@ -55,12 +55,14 @@
 }
 
 .mapPanel {
+  --auditorium-width: min(78%, 720px);
+
   overflow-x: auto;
   padding: clamp(1rem, 4vw, 2rem);
 }
 
 .screen {
-  width: min(78%, 620px);
+  width: var(--auditorium-width);
   min-height: 20px;
   margin: 0 auto $space-5;
   border-radius: 0 0 999px 999px;
@@ -77,14 +79,16 @@
 
 .seatMap {
   display: grid;
+  width: calc(var(--auditorium-width) + 62px);
+  min-width: 622px;
+  margin: 0 auto;
   gap: 12px;
-  min-width: 560px;
 }
 
 .seatRow {
   display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: $space-2;
+  grid-template-columns: 44px var(--auditorium-width);
+  gap: 18px;
   align-items: center;
 }
 
@@ -100,8 +104,9 @@
 }
 
 .seatCells {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(var(--seat-count), minmax(38px, 44px));
+  justify-content: space-between;
   gap: 10px;
 }
 
@@ -274,7 +279,8 @@
 }
 
 .error,
-.success {
+.success,
+.warning {
   margin: 0;
   padding: 12px 14px;
   border-radius: 16px;
@@ -289,6 +295,12 @@
 .success {
   color: #081e13;
   background: rgba($color-success, 0.9);
+}
+
+.warning {
+  color: $color-text;
+  background: rgba($color-gold, 0.18);
+  border: 1px solid rgba($color-gold, 0.28);
 }
 
 .bookingResult {
@@ -358,6 +370,10 @@
 }
 
 @media (max-width: $breakpoint-md) {
+  .mapPanel {
+    --auditorium-width: 480px;
+  }
+
   .page {
     width: min(100% - 22px, $container-max-width);
     padding-top: $space-5;
@@ -371,7 +387,8 @@
   }
 
   .seatMap {
-    min-width: 480px;
+    width: 542px;
+    min-width: 542px;
   }
 
   .seat {

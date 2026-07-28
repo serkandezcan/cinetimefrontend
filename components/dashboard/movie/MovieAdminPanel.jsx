@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -14,7 +14,7 @@ const initialForm = {
   cast: "",
   formats: "IMAX, 2D",
   genre: "",
-  status: String(MOVIE_STATUS.NOW_SHOWING),
+  status: MOVIE_STATUS.NOW_SHOWING,
   specialHalls: "",
   rating: "",
 };
@@ -53,7 +53,7 @@ export default function MovieAdminPanel() {
       cast: splitList(form.cast),
       formats: splitList(form.formats),
       genre: form.genre.trim(),
-      status: Number(form.status),
+      status: form.status,
       specialHalls: form.specialHalls.trim(),
       rating: Number(form.rating),
     };

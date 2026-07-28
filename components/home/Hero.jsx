@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowRight, Play, ShieldCheck } from "lucide-react";
 import styles from "./hero.module.scss";
 
@@ -32,14 +32,14 @@ export default function Hero() {
       </div>
 
       <div className={styles.posterStage} aria-label="Featured movie preview">
-        <div className={styles.posterCard}>
+        <Link href="/movies/1" className={styles.posterCard} aria-label="Dune Part Two film detayina git">
           <div className={styles.posterTopline}>Tonight / 20:30</div>
           <h2>Dune Part Two</h2>
           <p>IMAX salonunda koltugunu sec, mock payment ile biletini al.</p>
-          <button type="button" className={styles.playButton} aria-label="Fragman izle">
+          <span className={styles.playButton} aria-hidden="true">
             <Play size={18} fill="currentColor" />
-          </button>
-        </div>
+          </span>
+        </Link>
         <div className={styles.seatMiniMap} aria-hidden="true">
           {Array.from({ length: 24 }).map((_, index) => (
             <span key={index} className={index === 8 || index === 9 ? styles.booked : ""} />

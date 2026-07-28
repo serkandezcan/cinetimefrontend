@@ -1,4 +1,4 @@
-﻿// Footer navigation groups. Keep links in one place so components stay simple.
+// Footer navigation groups. Keep links in one place so components stay simple.
 
 export const FOOTER_LINK_GROUPS = [
   {
@@ -31,9 +31,12 @@ export const FOOTER_LINK_GROUPS = [
 ];
 
 export const FOOTER_SOCIAL_LINKS = [
-  { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
+  { label: "Facebook", href: "https://facebook.com", icon: "facebook" },
   { label: "X", href: "https://x.com", icon: "twitter" },
   { label: "YouTube", href: "https://youtube.com", icon: "youtube" },
+  { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
+  { label: "TikTok", href: "https://tiktok.com", icon: "tiktok" },
+  { label: "WhatsApp", href: "https://www.whatsapp.com", icon: "whatsapp" },
 ];
 
 export default FOOTER_LINK_GROUPS;

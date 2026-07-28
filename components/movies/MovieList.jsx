@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { getMovies, MOVIE_STATUS } from "@/services/movie-service";
+import { getMovies, MOVIE_STATUS, normalizeMovieStatus } from "@/services/movie-service";
 import MovieCard from "./MovieCard";
 import styles from "./movie-list.module.scss";
 
@@ -14,7 +14,7 @@ const FILTERS = [
 
 function matchesStatus(movieStatus, filterValue) {
   if (filterValue === "ALL") return true;
-  return String(movieStatus) === String(filterValue);
+  return normalizeMovieStatus(movieStatus) === normalizeMovieStatus(filterValue);
 }
 
 export default function MovieList() {
@@ -129,4 +129,3 @@ export default function MovieList() {
     </section>
   );
 }
-

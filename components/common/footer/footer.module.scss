@@ -1,10 +1,67 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .footer {
   border-top: 1px solid rgba($color-text, 0.08);
   background:
     radial-gradient(circle at 100% 0%, rgba($color-red, 0.16), transparent 28%),
     linear-gradient(180deg, rgba($color-panel, 0.68), rgba($color-bg, 0.96));
+}
+
+.followBar {
+  background: #99aa18;
+  color: #fff;
+}
+
+.followInner {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(0, 2fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  width: min(100% - 32px, $container-max-width);
+  min-height: 88px;
+  margin: 0 auto;
+  padding: 18px 0;
+}
+
+.followTitle {
+  color: #fff;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-weight: 950;
+  letter-spacing: -0.02em;
+}
+
+.socials {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
+  align-items: center;
+  gap: clamp(1rem, 4vw, 4.5rem);
+
+  a {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    justify-self: center;
+    border-radius: 18px;
+    color: #fff;
+    text-decoration: none;
+    transition:
+      background $transition-base,
+      transform $transition-base;
+
+    &:hover {
+      transform: translateY(-2px) scale(1.04);
+      background: rgba(#fff, 0.14);
+    }
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.cutout {
+  color: #99aa18;
 }
 
 .inner {
@@ -41,28 +98,6 @@
   border-radius: 14px;
   color: $color-bg;
   background: $color-gold;
-}
-
-.socials {
-  display: flex;
-  gap: $space-2;
-
-  a {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    place-items: center;
-    border: 1px solid rgba($color-text, 0.1);
-    border-radius: 50%;
-    color: $color-text;
-    background: rgba($color-text, 0.05);
-    transition: transform $transition-base, border-color $transition-base;
-
-    &:hover {
-      transform: translateY(-2px);
-      border-color: rgba($color-gold, 0.5);
-    }
-  }
 }
 
 .linkGrid {
@@ -107,9 +142,15 @@
 }
 
 @media (max-width: $breakpoint-lg) {
+  .followInner,
   .inner,
   .linkGrid {
     grid-template-columns: 1fr;
+  }
+
+  .socials {
+    max-width: 520px;
+    grid-template-columns: repeat(3, minmax(44px, 1fr));
   }
 
   .linkGrid {
@@ -118,6 +159,21 @@
 }
 
 @media (max-width: $breakpoint-md) {
+  .followInner {
+    gap: $space-3;
+    min-height: auto;
+    padding: $space-4 0;
+  }
+
+  .socials {
+    grid-template-columns: repeat(2, minmax(44px, 1fr));
+    gap: $space-2;
+  }
+
+  .socials a {
+    justify-self: start;
+  }
+
   .bottomBar {
     flex-direction: column;
   }

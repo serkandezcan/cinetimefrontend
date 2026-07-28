@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .hero {
   position: relative;
@@ -75,6 +75,11 @@
 
 .posterCard {
   position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform $transition-base, border-color $transition-base, box-shadow $transition-base;
   min-height: 460px;
   padding: clamp(1.5rem, 4vw, 2.5rem);
   overflow: hidden;
@@ -85,6 +90,18 @@
     radial-gradient(circle at 80% 20%, rgba($color-blue, 0.2), transparent 24%),
     linear-gradient(150deg, #20100f, #0d1728 55%, #07111f);
   box-shadow: 0 42px 100px rgba(0, 0, 0, 0.36);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-6px);
+    border-color: rgba($color-gold, 0.42);
+    box-shadow: 0 50px 115px rgba(0, 0, 0, 0.42);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($color-gold, 0.55);
+    outline-offset: 5px;
+  }
 
   &::after {
     position: absolute;

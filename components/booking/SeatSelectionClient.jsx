@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ArrowLeft, CheckCircle2, RefreshCw } from "lucide-react";
+import { getSeatId, isSeatAvailable } from "@/helpers/seat-helpers";
+import { getShowtimeUnavailableMessage, translateBookingError } from "@/helpers/showtime-helpers";
 import { createBooking } from "@/services/booking-service";
 import { getShowtimeSeats, getShowtimes } from "@/services/showtime-service";
 import BookingSummary from "./BookingSummary";
@@ -11,9 +14,8 @@ import SeatLegend from "./SeatLegend";
 import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
 
-function getSeatId(seat) {
-  return seat.seatId ?? seat.id;
-}
+const BOOKING_EXIT_CONFIRM_MESSAGE =
+  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki booking akisi sifirlanacak.";
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -29,7 +31,12 @@ function getShowtimeTime(showtime) {
   return "--:--";
 }
 
+function normalizeSessionRole(role) {
+  return String(role ?? "").replace(/^ROLE_/, "").toUpperCase();
+}
+
 export default function SeatSelectionClient({ showtimeId }) {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [seats, setSeats] = useState([]);
   const [showtime, setShowtime] = useState(null);
@@ -53,7 +60,11 @@ export default function SeatSelectionClient({ showtimeId }) {
       const normalizedSeats = Array.isArray(seatList) ? seatList : [];
       setSeats(normalizedSeats);
       setShowtime((showtimeList || []).find((item) => String(item.id) === String(showtimeId)) || null);
-      setSelectedSeatIds((current) => current.filter((id) => normalizedSeats.some((seat) => String(getSeatId(seat)) === String(id) && seat.available)));
+      setSelectedSeatIds((current) =>
+        current.filter((id) =>
+          normalizedSeats.some((seat) => String(getSeatId(seat)) === String(id) && isSeatAvailable(seat))
+        )
+      );
     } catch (error) {
       setErrorMessage(error.message || "Koltuk bilgileri yuklenemedi.");
     } finally {
@@ -95,9 +106,72 @@ export default function SeatSelectionClient({ showtimeId }) {
 
   const seatPrice = Number(showtime?.price || 0);
   const totalPrice = selectedSeats.length * seatPrice;
+  const bookingUnavailableMessage = getShowtimeUnavailableMessage(showtime);
+  const normalizedRole = normalizeSessionRole(session?.user?.role);
+  const isCustomer = normalizedRole === "CUSTOMER";
+  const bookingAccessMessage = status === "authenticated" && !isCustomer
+    ? "Booking olusturmak icin customer hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
+    : "";
+  const bookingBlockedMessage = bookingUnavailableMessage || bookingAccessMessage;
+  const isBookable = !bookingBlockedMessage;
+  const hasBookingProgress = selectedSeatIds.length > 0 || Boolean(booking) || isSubmitting;
+
+  const resetBookingFlow = useCallback(() => {
+    setSelectedSeatIds([]);
+    setBooking(null);
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, []);
+
+  const confirmBookingExit = useCallback(() => {
+    if (!hasBookingProgress) return true;
+
+    const shouldExit = window.confirm(BOOKING_EXIT_CONFIRM_MESSAGE);
+    if (shouldExit) resetBookingFlow();
+    return shouldExit;
+  }, [hasBookingProgress, resetBookingFlow]);
+
+  useEffect(() => {
+    if (!hasBookingProgress) return undefined;
+
+    function handleBeforeUnload(event) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasBookingProgress]);
+
+  useEffect(() => {
+    function handleDocumentClick(event) {
+      if (!hasBookingProgress || event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const target = event.target instanceof Element ? event.target : null;
+      const anchor = target?.closest("a[href]");
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+
+      const nextHref = `${url.pathname}${url.search}${url.hash}`;
+      const currentHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      if (nextHref === currentHref) return;
+
+      event.preventDefault();
+      if (confirmBookingExit()) router.push(nextHref);
+    }
+
+    document.addEventListener("click", handleDocumentClick, true);
+    return () => document.removeEventListener("click", handleDocumentClick, true);
+  }, [confirmBookingExit, hasBookingProgress, router]);
 
   function handleToggleSeat(seat) {
-    if (!seat.available || booking) return;
+    if (!isSeatAvailable(seat) || booking || !isBookable) return;
 
     const seatId = getSeatId(seat);
     setSuccessMessage("");
@@ -112,6 +186,11 @@ export default function SeatSelectionClient({ showtimeId }) {
   async function handleCreateBooking() {
     if (!session?.accessToken) {
       setErrorMessage("Booking olusturmak icin customer olarak giris yapmalisin.");
+      return;
+    }
+
+    if (!isBookable) {
+      setErrorMessage(bookingBlockedMessage);
       return;
     }
 
@@ -137,7 +216,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       setSuccessMessage(`Booking #${createdBooking?.id || ""} olusturuldu.`);
       await loadSeatData({ silent: true });
     } catch (error) {
-      setErrorMessage(error.message || "Booking olusturulamadi.");
+      setErrorMessage(translateBookingError(error.message));
     } finally {
       setIsSubmitting(false);
     }
@@ -173,7 +252,12 @@ export default function SeatSelectionClient({ showtimeId }) {
         <div className={styles.layout}>
           <div className={styles.mapPanel}>
             <div className={styles.screen}>Perde</div>
-            <SeatMap seats={seats} selectedSeatIds={selectedSeatIds} onToggleSeat={handleToggleSeat} />
+            <SeatMap
+              seats={seats}
+              selectedSeatIds={selectedSeatIds}
+              onToggleSeat={handleToggleSeat}
+              isInteractionDisabled={!isBookable || !!booking}
+            />
             <SeatLegend />
           </div>
 
@@ -185,6 +269,8 @@ export default function SeatSelectionClient({ showtimeId }) {
             isSubmitting={isSubmitting}
             isAuthenticated={status === "authenticated"}
             booking={booking}
+            isBookable={isBookable}
+            bookingUnavailableMessage={bookingBlockedMessage}
             errorMessage={errorMessage}
             successMessage={successMessage}
             onCreateBooking={handleCreateBooking}
@@ -201,4 +287,3 @@ export default function SeatSelectionClient({ showtimeId }) {
     </section>
   );
 }
-
