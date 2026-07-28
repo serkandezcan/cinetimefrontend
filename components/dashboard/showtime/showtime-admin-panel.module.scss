@@ -1,0 +1,164 @@
+﻿@use "@/styles/variables" as *;
+
+.page {
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 0;
+}
+
+.header {
+  max-width: 820px;
+  margin-bottom: $space-4;
+
+  h1 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    font-weight: 950;
+    letter-spacing: -0.07em;
+  }
+
+  p {
+    color: rgba($color-text, 0.68);
+  }
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $space-3;
+  padding: $space-4;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 32px;
+  background: rgba($color-panel, 0.66);
+
+  label {
+    display: grid;
+    gap: 8px;
+    color: rgba($color-text, 0.68);
+    font-size: 0.9rem;
+    font-weight: 900;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid rgba($color-text, 0.1);
+    border-radius: 16px;
+    padding: 0 14px;
+    color: $color-text;
+    background: rgba($color-bg, 0.52);
+    outline: 0;
+  }
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+.success,
+.error {
+  margin: 0 0 $space-2;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-weight: 900;
+}
+
+.success {
+  color: #092116;
+  background: rgba($color-success, 0.9);
+}
+
+.error {
+  color: $color-text;
+  background: rgba($color-danger, 0.36);
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  margin: $space-5 0 $space-3;
+
+  h2 {
+    margin: 0;
+    color: $color-text;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 950;
+    letter-spacing: -0.055em;
+  }
+}
+
+.stateBox,
+.rowCard {
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 24px;
+  background: rgba($color-panel, 0.66);
+}
+
+.stateBox {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  color: rgba($color-text, 0.72);
+}
+
+.tableLike {
+  display: grid;
+  gap: $space-2;
+}
+
+.rowCard {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.8fr auto;
+  gap: $space-3;
+  align-items: center;
+  padding: $space-3;
+  color: $color-text;
+
+  div {
+    display: grid;
+    gap: 4px;
+  }
+
+  span {
+    color: rgba($color-text, 0.58);
+    font-size: 0.9rem;
+  }
+
+  button {
+    min-height: 42px;
+    border: 1px solid rgba($color-danger, 0.4);
+    border-radius: $radius-pill;
+    padding: 0 $space-3;
+    color: $color-text;
+    background: rgba($color-danger, 0.16);
+    font-weight: 900;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .form,
+  .rowCard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .form,
+  .rowCard {
+    grid-template-columns: 1fr;
+  }
+
+  .listHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

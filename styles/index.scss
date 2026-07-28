@@ -86,4 +86,41 @@ a {
   color: $color-text;
   background: rgba($color-text, 0.05);
 }
+.ct-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ct-field {
+  display: grid;
+  gap: 8px;
+  color: rgba($color-text, 0.68);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.ct-field input,
+.ct-field select {
+  min-height: 50px;
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: 16px;
+  padding: 0 14px;
+  color: $color-text;
+  background: rgba($color-bg, 0.52);
+  outline: 0;
+}
+
+.ct-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: $breakpoint-lg) {
+  .ct-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
 

@@ -1,7 +1,7 @@
-import PageHeader from "@/components/common/page-header/PageHeader";
+﻿import ShowtimeAdminPanel from "@/components/dashboard/showtime/ShowtimeAdminPanel";
 
 export const metadata = { title: "Admin Showtimes" };
 
-export default function Page() {
-  return <PageHeader title="Admin Showtimes" description="This page will be implemented step by step." />;
+export default function AdminShowtimesPage() {
+  return <ShowtimeAdminPanel />;
 }
