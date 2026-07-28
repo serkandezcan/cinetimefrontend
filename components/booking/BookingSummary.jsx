@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { RefreshCw, Ticket } from "lucide-react";
+import { getSeatId, getSeatLabel } from "@/helpers/seat-helpers";
 import styles from "./seat-selection.module.scss";
-
-function seatLabel(seat) {
-  return `${seat.rowLabel ?? seat.rowLetter ?? "?"}${seat.seatNumber}`;
-}
 
 export default function BookingSummary({
   showtime,
@@ -42,7 +39,7 @@ export default function BookingSummary({
         ) : (
           <div>
             {selectedSeats.map((seat) => (
-              <span key={seat.seatId ?? seat.id}>{seatLabel(seat)}</span>
+              <span key={getSeatId(seat)}>{getSeatLabel(seat)}</span>
             ))}
           </div>
         )}

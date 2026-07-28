@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { ArrowLeft, CheckCircle2, RefreshCw } from "lucide-react";
+import { getSeatId, isSeatAvailable } from "@/helpers/seat-helpers";
 import { createBooking } from "@/services/booking-service";
 import { getShowtimeSeats, getShowtimes } from "@/services/showtime-service";
 import BookingSummary from "./BookingSummary";
@@ -11,9 +12,6 @@ import SeatLegend from "./SeatLegend";
 import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
 
-function getSeatId(seat) {
-  return seat.seatId ?? seat.id;
-}
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -53,7 +51,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       const normalizedSeats = Array.isArray(seatList) ? seatList : [];
       setSeats(normalizedSeats);
       setShowtime((showtimeList || []).find((item) => String(item.id) === String(showtimeId)) || null);
-      setSelectedSeatIds((current) => current.filter((id) => normalizedSeats.some((seat) => String(getSeatId(seat)) === String(id) && seat.available)));
+      setSelectedSeatIds((current) => current.filter((id) => normalizedSeats.some((seat) => String(getSeatId(seat)) === String(id) && isSeatAvailable(seat))));
     } catch (error) {
       setErrorMessage(error.message || "Koltuk bilgileri yuklenemedi.");
     } finally {
@@ -97,7 +95,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   const totalPrice = selectedSeats.length * seatPrice;
 
   function handleToggleSeat(seat) {
-    if (!seat.available || booking) return;
+    if (!isSeatAvailable(seat) || booking) return;
 
     const seatId = getSeatId(seat);
     setSuccessMessage("");
@@ -201,4 +199,3 @@ export default function SeatSelectionClient({ showtimeId }) {
     </section>
   );
 }
-
