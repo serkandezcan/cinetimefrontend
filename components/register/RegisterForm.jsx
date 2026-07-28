@@ -21,6 +21,23 @@ const INITIAL_FORM = {
   confirmPassword: "",
 };
 
+function formatPhoneNumber(value) {
+  const digitsOnly = value.replace(/\D/g, "");
+  const withoutCountryCode = digitsOnly.startsWith("90") && digitsOnly.length > 10
+    ? digitsOnly.slice(2)
+    : digitsOnly;
+  const localDigits = withoutCountryCode.startsWith("0") && withoutCountryCode.length > 10
+    ? withoutCountryCode.slice(1)
+    : withoutCountryCode;
+  const digits = localDigits.slice(0, 10);
+
+  if (!digits) return "";
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 export default function RegisterForm() {
   const router = useRouter();
   const t = AUTH_MESSAGES.register;
@@ -32,14 +49,17 @@ export default function RegisterForm() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const nextValue = name === "phoneNumber" ? formatPhoneNumber(value) : value;
+
+    setForm((prev) => ({ ...prev, [name]: nextValue }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   }
 
-  function validate() {
-    const result = registerSchema.safeParse(form);
+  function validate(nextForm) {
+    const result = registerSchema.safeParse(nextForm);
 
     if (result.success) {
+      setForm(nextForm);
       setErrors({});
       return true;
     }
@@ -57,12 +77,17 @@ export default function RegisterForm() {
     e.preventDefault();
     setFormError(null);
 
-    if (!validate()) return;
+    const normalizedForm = {
+      ...form,
+      phoneNumber: formatPhoneNumber(form.phoneNumber),
+    };
+
+    if (!validate(normalizedForm)) return;
 
     setIsSubmitting(true);
     try {
-      // confirmPassword backend'e gitmiyor, sadece frontend doğrulaması içindi.
-      const { confirmPassword, ...payload } = form;
+      // confirmPassword backend'e gitmiyor, sadece frontend dogrulamasi icindi.
+      const { confirmPassword, ...payload } = normalizedForm;
 
       await apiClient.post(API_ROUTES.auth.register, payload);
       router.push("/login");
@@ -105,6 +130,9 @@ export default function RegisterForm() {
       <Input
         label={t.fields.phoneNumber}
         name="phoneNumber"
+        type="tel"
+        inputMode="numeric"
+        autoComplete="tel"
         placeholder={t.fields.phoneNumberPlaceholder}
         value={form.phoneNumber}
         onChange={handleChange}

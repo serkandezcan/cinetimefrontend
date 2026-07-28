@@ -13,7 +13,7 @@ import styles from "./login-form.module.scss";
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") || "/account";
   const t = AUTH_MESSAGES.login;
 
   const [form, setForm] = useState({ email: "", password: "" });

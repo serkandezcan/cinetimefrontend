@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { config } from "@/helpers/config";
 
 export async function getCurrentSession() {
   return auth();
@@ -7,9 +8,7 @@ export async function getCurrentSession() {
 export async function requireSession() {
   const session = await auth();
   if (!session) {
-    throw new Error(
-      "Oturum bulunamadı. Bu fonksiyon sadece login sonrası çağrılmalı."
-    );
+    throw new Error("Oturum bulunamadi. Bu fonksiyon sadece login sonrasi cagrilmali.");
   }
   return session;
 }
@@ -19,32 +18,46 @@ export async function getAccessToken() {
   return session?.accessToken ?? null;
 }
 
-/**
- * JWT'nin süresi dolmuş mu kontrol eder (imza doğrulamadan, sadece `exp` claim'i).
- * Not: middleware (proxy.js) Edge runtime'da çalışır, Node'un `Buffer`'ı
- * her zaman garanti değildir — bu yüzden atob tabanlı, Edge-uyumlu decode kullanıyoruz.
- */
+export function normalizeRole(role) {
+  if (!role) return null;
+  return String(role).replace(/^ROLE_/, "").toUpperCase();
+}
+
+export function getDefaultAuthenticatedPath(role) {
+  return normalizeRole(role) === config.roleNames.admin ? "/dashboard" : "/account";
+}
+
 export function getIsTokenValid(token) {
   if (!token) return false;
 
   try {
     const payload = token.split(".")[1];
     const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    if (!decoded.exp) return true; // exp yoksa süresiz kabul ediyoruz
+    if (!decoded.exp) return true;
     return Date.now() < decoded.exp * 1000;
   } catch {
     return false;
   }
 }
 
-/**
- * Role bazlı route yetkilendirmesi.
- * Şu an sadece /admin/* prefix'ini ADMIN role'üyle sınırlıyor — ihtiyaç
- * arttıkça buraya yeni kural eklenir.
- */
 export function getIsUserAuthorized(role, pathname) {
-  if (pathname.startsWith("/admin")) {
-    return role === "ROLE_ADMIN";
+  const normalizedRole = normalizeRole(role);
+
+  if (!normalizedRole) {
+    return false;
   }
+
+  const matchingRule = config.userRightsOnRoutes.find((routeRule) =>
+    routeRule.urlRegex.test(pathname)
+  );
+
+  if (matchingRule) {
+    return matchingRule.roles.includes(normalizedRole);
+  }
+
+  if (pathname.startsWith("/admin")) {
+    return normalizedRole === config.roleNames.admin;
+  }
+
   return true;
 }
