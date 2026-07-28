@@ -279,7 +279,8 @@
 }
 
 .error,
-.success {
+.success,
+.warning {
   margin: 0;
   padding: 12px 14px;
   border-radius: 16px;
@@ -294,6 +295,12 @@
 .success {
   color: #081e13;
   background: rgba($color-success, 0.9);
+}
+
+.warning {
+  color: $color-text;
+  background: rgba($color-gold, 0.18);
+  border: 1px solid rgba($color-gold, 0.28);
 }
 
 .bookingResult {

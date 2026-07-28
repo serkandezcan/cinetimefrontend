@@ -1,35 +1,204 @@
 @use "@/styles/variables" as *;
 
 .detail {
-  max-width: 560px;
+  width: min(100% - 32px, $container-max-width);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: $space-2;
+  gap: $space-4;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-3;
 }
 
 .row {
   display: flex;
+  min-height: 92px;
   flex-direction: column;
+  justify-content: center;
   gap: $space-1;
   margin: 0;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 20px;
+  background: rgba($color-text, 0.04);
   color: $color-text;
   font-size: $font-size-base;
+  line-height: 1.55;
+  padding: $space-3;
 
   span {
     color: $color-text-muted;
     font-size: $font-size-sm;
-    font-weight: 500;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 }
 
-.backLink {
-  margin-top: $space-3;
-  color: $color-gold;
-  font-size: $font-size-sm;
-  font-weight: 600;
-  align-self: flex-start;
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
 
-  &:hover {
-    text-decoration: underline;
+.mapLink,
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: $radius-pill;
+  font-size: $font-size-sm;
+  font-weight: 950;
+  padding: 0 $space-4;
+  text-decoration: none;
+  transition: transform $transition-base, border-color $transition-base, background $transition-base;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+  }
+}
+
+.mapLink {
+  background: $color-gold;
+  color: $color-bg;
+}
+
+.backLink {
+  border: 1px solid rgba($color-text, 0.16);
+  color: $color-text;
+  background: rgba($color-text, 0.05);
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba($color-gold, 0.45);
+    color: $color-gold;
+  }
+}
+
+
+.hallsSection {
+  width: min(100% - 32px, $container-max-width);
+  margin: $space-5 auto 0;
+}
+
+.sectionHeader {
+  max-width: 720px;
+  margin-bottom: $space-3;
+
+  h2 {
+    margin: $space-2 0;
+    color: $color-text;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 950;
+    letter-spacing: -0.065em;
+    line-height: 0.95;
+  }
+
+  p {
+    color: rgba($color-text, 0.68);
+    font-size: 1.02rem;
+    line-height: 1.7;
+  }
+}
+
+.hallGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-3;
+}
+
+.hallCard,
+.hallState {
+  border: 1px solid rgba($color-text, 0.09);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 20% 10%, rgba($color-gold, 0.12), transparent 34%),
+    linear-gradient(145deg, rgba($color-text, 0.08), rgba($color-text, 0.02)),
+    rgba($color-panel, 0.74);
+  color: $color-text;
+}
+
+.hallCard {
+  display: grid;
+  gap: $space-3;
+  padding: $space-4;
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    font-size: 1.25rem;
+    font-weight: 950;
+  }
+
+  span {
+    margin-top: 6px;
+    color: $color-gold;
+    font-size: $font-size-sm;
+    font-weight: 950;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-2;
+    margin: 0;
+  }
+
+  div {
+    min-width: 0;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dt {
+    color: rgba($color-text, 0.56);
+    font-size: $font-size-sm;
+    font-weight: 800;
+  }
+
+  dd {
+    margin-top: 4px;
+    color: $color-text;
+    font-size: 1.35rem;
+    font-weight: 950;
+  }
+}
+
+.hallState {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  color: rgba($color-text, 0.72);
+  padding: $space-4;
+  text-align: center;
+}
+
+@media (max-width: $breakpoint-md) {
+  .detail,
+  .hallsSection {
+    width: min(100% - 24px, $container-max-width);
+  }
+
+  .detailGrid,
+  .hallGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mapLink,
+  .backLink {
+    width: 100%;
   }
 }

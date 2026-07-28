@@ -7,7 +7,7 @@ import {
 } from "@/helpers/seat-helpers";
 import styles from "./seat-selection.module.scss";
 
-export default function SeatMap({ seats = [], selectedSeatIds = [], onToggleSeat }) {
+export default function SeatMap({ seats = [], selectedSeatIds = [], onToggleSeat, isInteractionDisabled = false }) {
   const groupedSeats = seats.reduce((acc, seat) => {
     const row = getSeatRow(seat);
     acc[row] = [...(acc[row] || []), seat].sort((a, b) => a.seatNumber - b.seatNumber);
@@ -29,11 +29,13 @@ export default function SeatMap({ seats = [], selectedSeatIds = [], onToggleSeat
               const seatId = getSeatId(seat);
               const isSelected = selectedSeatIds.includes(seatId);
               const isAvailable = isSeatAvailable(seat);
+              const isDisabled = !isAvailable || isInteractionDisabled;
               const seatType = getSeatType(seat);
               const seatClassName = [
                 styles.seat,
                 isSelected ? styles.selectedSeat : "",
                 !isAvailable ? styles.bookedSeat : "",
+                isInteractionDisabled && isAvailable ? styles.disabledSeat : "",
                 seatType === "PREMIUM" ? styles.premiumSeat : "",
                 seatType === "DISABLED" ? styles.disabledSeat : "",
               ].filter(Boolean).join(" ");
@@ -44,9 +46,9 @@ export default function SeatMap({ seats = [], selectedSeatIds = [], onToggleSeat
                   type="button"
                   className={seatClassName}
                   onClick={() => onToggleSeat(seat)}
-                  disabled={!isAvailable}
+                  disabled={isDisabled}
                   aria-pressed={isSelected}
-                  aria-label={`${getSeatLabel(seat)} koltugu ${isAvailable ? "musait" : "dolu"}`}
+                  aria-label={`${getSeatLabel(seat)} koltugu ${isDisabled ? "secilemez" : "musait"}`}
                 >
                   {seat.seatNumber}
                 </button>

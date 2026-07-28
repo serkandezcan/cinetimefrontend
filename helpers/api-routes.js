@@ -1,6 +1,4 @@
-
-// Backend API route tanımları.
-
+// Backend API route definitions.
 
 export const API_ROUTES = {
   auth: {
@@ -12,7 +10,7 @@ export const API_ROUTES = {
     resetPassword: "/auth/reset-password",
   },
 
-  // Giriş yapmış kullanıcının kendi profili
+  // Current signed-in user's own profile.
   user: {
     me: "/user/me",
     updateMe: "/user/me", // PATCH
@@ -20,7 +18,7 @@ export const API_ROUTES = {
     updatePassword: "/user/me/password", // PATCH
   },
 
-  // Admin - kullanıcı yönetimi
+  // Admin - user management.
   adminUsers: {
     list: "/admin/users",
     detail: (id) => `/admin/user/${id}`,
@@ -28,18 +26,17 @@ export const API_ROUTES = {
     delete: (id) => `/admin/user/${id}`, // DELETE
   },
 
-  //
-  /* 
-    adminMovies: {
+  /*
+  adminMovies: {
     create: "admin/movies", // POST
     update: (id) => `admin/movies/${id}`, // PUT
     delete: (id) => `admin/movies/${id}`, // DELETE
-    detail: (id) => `admin/movies/${id}/`, 
+    detail: (id) => `admin/movies/${id}/`,
   },
- */
+  */
 
-  /* 
-    movies: {
+  /*
+  movies: {
     list: "/movies",
     detail: (id) => `/movies/${id}`,
     detailBySlug: (slug) => `/movies/slug/${slug}`,
@@ -49,7 +46,7 @@ export const API_ROUTES = {
     archived: "/movies/archived",
     byHall: (hall) => `/movies/hall/${hall}`,
   },
- */
+  */
   movies: {
     list: "/api/movies",
     create: "/api/movies", // POST
@@ -68,6 +65,7 @@ export const API_ROUTES = {
   cinemas: {
     list: "/cinemas",
     detail: (id) => `/cinemas/${id}`,
+    halls: (id) => `/cinemas/${id}/halls`,
   },
 
   showtimes: {
@@ -75,7 +73,7 @@ export const API_ROUTES = {
     seats: (id) => `/showtimes/${id}/seats`,
   },
 
-  // Admin - showtime/hall/cinema yönetimi
+  // Admin - showtime/hall/cinema management.
   admin: {
     createShowtime: "/admin/showtimes", // POST
     cancelShowtime: (id) => `/admin/showtimes/${id}/cancel`, // PATCH
@@ -83,7 +81,7 @@ export const API_ROUTES = {
     createCinema: "/admin/cinemas", // POST
   },
 
-  // Müşteri - rezervasyon/booking işlemleri
+  // Customer - reservation/booking operations.
   bookings: {
     list: "/customer/bookings",
     create: "/customer/bookings", // POST

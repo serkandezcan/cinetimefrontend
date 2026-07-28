@@ -11,6 +11,8 @@ export default function BookingSummary({
   isSubmitting,
   isAuthenticated,
   booking,
+  isBookable = true,
+  bookingUnavailableMessage = "",
   errorMessage,
   successMessage,
   onCreateBooking,
@@ -50,6 +52,9 @@ export default function BookingSummary({
         <strong>{totalPrice.toFixed(2)} TL</strong>
       </div>
 
+      {!isBookable && bookingUnavailableMessage && (
+        <p className={styles.warning} role="status">{bookingUnavailableMessage}</p>
+      )}
       {errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
       {successMessage && <p className={styles.success}>{successMessage}</p>}
 
@@ -64,7 +69,7 @@ export default function BookingSummary({
           type="button"
           className="ct-button ct-button-primary"
           onClick={onCreateBooking}
-          disabled={isSubmitting || selectedSeats.length === 0}
+          disabled={isSubmitting || selectedSeats.length === 0 || !isBookable}
         >
           <Ticket size={17} /> {isSubmitting ? "Booking olusturuluyor..." : "Booking olustur"}
         </button>

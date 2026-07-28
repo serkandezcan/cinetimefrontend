@@ -1,23 +1,43 @@
-﻿import { API_ROUTES } from "@/helpers/api-routes";
+import { API_ROUTES } from "@/helpers/api-routes";
 import { apiClient } from "@/services/api-client";
 
 export const MOVIE_STATUS = {
-  NOW_SHOWING: 0,
-  COMING_SOON: 1,
-  ARCHIVED: 2,
+  NOW_SHOWING: "NOW_SHOWING",
+  COMING_SOON: "COMING_SOON",
+  ARCHIVED: "ARCHIVED",
+};
+
+const STATUS_ALIASES = {
+  0: MOVIE_STATUS.NOW_SHOWING,
+  1: MOVIE_STATUS.COMING_SOON,
+  2: MOVIE_STATUS.ARCHIVED,
+  ACTIVE: MOVIE_STATUS.NOW_SHOWING,
+  SHOWING: MOVIE_STATUS.NOW_SHOWING,
+  IN_THEATERS: MOVIE_STATUS.NOW_SHOWING,
+  RELEASED: MOVIE_STATUS.NOW_SHOWING,
+  NOW_SHOWING: MOVIE_STATUS.NOW_SHOWING,
+  COMING: MOVIE_STATUS.COMING_SOON,
+  SOON: MOVIE_STATUS.COMING_SOON,
+  COMING_SOON: MOVIE_STATUS.COMING_SOON,
+  ARCHIVE: MOVIE_STATUS.ARCHIVED,
+  ARCHIVED: MOVIE_STATUS.ARCHIVED,
 };
 
 const STATUS_LABELS = {
-  0: "Gosterimde",
-  1: "Yakinda",
-  2: "Arsiv",
-  NOW_SHOWING: "Gosterimde",
-  COMING_SOON: "Yakinda",
-  ARCHIVED: "Arsiv",
+  [MOVIE_STATUS.NOW_SHOWING]: "Gosterimde",
+  [MOVIE_STATUS.COMING_SOON]: "Yakinda",
+  [MOVIE_STATUS.ARCHIVED]: "Arsiv",
 };
 
+export function normalizeMovieStatus(status) {
+  if (status === null || status === undefined || status === "") return "";
+  const key = String(status).trim().toUpperCase();
+  return STATUS_ALIASES[key] ?? key;
+}
+
 export function getMovieStatusLabel(status) {
-  return STATUS_LABELS[status] ?? "Bilinmiyor";
+  const normalizedStatus = normalizeMovieStatus(status);
+  return STATUS_LABELS[normalizedStatus] ?? "Bilinmiyor";
 }
 
 export function normalizeMoviePage(data) {
@@ -67,6 +87,7 @@ const movieService = {
   getMovieById,
   createMovie,
   getMovieStatusLabel,
+  normalizeMovieStatus,
 };
 
 export default movieService;

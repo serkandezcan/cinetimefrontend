@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarDays, Clock3, Film, MapPin, Ticket } from "lucide-react";
 import { getCinemas } from "@/services/cinema-service";
 import { getMovies } from "@/services/movie-service";
+import { filterBookableShowtimes } from "@/helpers/showtime-helpers";
 import { getShowtimes, getShowtimeStatusLabel } from "@/services/showtime-service";
 import ShowtimeFilter from "./ShowtimeFilter";
 import styles from "./showtime-list.module.scss";
@@ -66,7 +67,7 @@ export default function ShowtimeList() {
 
       try {
         const data = await getShowtimes(appliedFilters);
-        if (isMounted) setShowtimes(Array.isArray(data) ? data : []);
+        if (isMounted) setShowtimes(filterBookableShowtimes(Array.isArray(data) ? data : []));
       } catch (error) {
         if (isMounted) setErrorMessage(error.message || "Seanslar yuklenemedi.");
       } finally {
@@ -86,7 +87,7 @@ export default function ShowtimeList() {
     if (appliedFilters.date) pieces.push(appliedFilters.date);
     if (appliedFilters.movieId) pieces.push(`film #${appliedFilters.movieId}`);
     if (appliedFilters.cinemaId) pieces.push(`sinema #${appliedFilters.cinemaId}`);
-    return pieces.length ? pieces.join(" / ") : "Tum aktif seanslar";
+    return pieces.length ? pieces.join(" / ") : "Tum rezervasyon yapilabilir seanslar";
   }, [appliedFilters]);
 
   function handleSubmit(event) {
