@@ -26,6 +26,7 @@
 }
 
 .select {
+  color-scheme: dark;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid $color-border;
   border-radius: $radius-base;
@@ -40,6 +41,16 @@
     box-shadow: 0 0 0 3px rgba($color-gold, 0.15);
   }
 }
+
+.select option {
+  color: $color-text;
+  background-color: $color-panel;
+}
+
+.select option:disabled {
+  color: rgba($color-text, 0.48);
+}
+
 
 .selectError {
   font-size: $font-size-sm;
