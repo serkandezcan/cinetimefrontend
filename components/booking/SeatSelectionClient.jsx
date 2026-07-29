@@ -7,12 +7,14 @@ import { useSession } from "next-auth/react";
 import { ArrowLeft, CheckCircle2, RefreshCw } from "lucide-react";
 import { getSeatId, isSeatAvailable } from "@/helpers/seat-helpers";
 import { getShowtimeUnavailableMessage, translateBookingError } from "@/helpers/showtime-helpers";
-import { createBooking } from "@/services/booking-service";
+import { createBooking, completePayment } from "@/services/booking-service";
 import { getShowtimeSeats, getShowtimes } from "@/services/showtime-service";
 import BookingSummary from "./BookingSummary";
 import SeatLegend from "./SeatLegend";
 import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
+import PaymentForm from "@/components/payment/PaymentForm"
+import PaymentResult from "@/components/payment/PaymentResult"
 
 const BOOKING_EXIT_CONFIRM_MESSAGE =
   "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki booking akisi sifirlanacak.";
@@ -42,6 +44,9 @@ export default function SeatSelectionClient({ showtimeId }) {
   const [showtime, setShowtime] = useState(null);
   const [selectedSeatIds, setSelectedSeatIds] = useState([]);
   const [booking, setBooking] = useState(null);
+  const [payment, setPayment] = useState(null);
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -114,13 +119,23 @@ export default function SeatSelectionClient({ showtimeId }) {
     : "";
   const bookingBlockedMessage = bookingUnavailableMessage || bookingAccessMessage;
   const isBookable = !bookingBlockedMessage;
-  const hasBookingProgress = selectedSeatIds.length > 0 || Boolean(booking) || isSubmitting;
+   
+  const hasBookingProgress =
+    selectedSeatIds.length > 0 ||
+    (Boolean(booking) && !payment) ||
+    isSubmitting ||
+    isPaying;
+ // const hasBookingProgress = selectedSeatIds.length > 0 || Boolean(booking) || isSubmitting;
 
   const resetBookingFlow = useCallback(() => {
     setSelectedSeatIds([]);
     setBooking(null);
+     setPayment(null);
+     setPaymentError("");
+     setIsPaying(false);
     setErrorMessage("");
     setSuccessMessage("");
+
   }, []);
 
   const confirmBookingExit = useCallback(() => {
@@ -211,7 +226,8 @@ export default function SeatSelectionClient({ showtimeId }) {
         },
         session.accessToken
       );
-
+      setPayment(null);
+      setPaymentError("");
       setBooking(createdBooking);
       setSuccessMessage(`Booking #${createdBooking?.id || ""} olusturuldu.`);
       await loadSeatData({ silent: true });
@@ -221,7 +237,35 @@ export default function SeatSelectionClient({ showtimeId }) {
       setIsSubmitting(false);
     }
   }
+async function handlePayment(payload) {
+  if (!booking?.id) {
+    setPaymentError("Odeme icin gecerli bir booking bulunamadi.");
+    return;
+  }
 
+  if (!session?.accessToken) {
+    setPaymentError("Odeme yapmak icin yeniden giris yapmalisin.");
+    return;
+  }
+
+  setIsPaying(true);
+  setPaymentError("");
+
+  try {
+    const paymentResult = await completePayment(
+      booking.id,
+      payload,
+      session.accessToken,
+    );
+
+    setPayment(paymentResult);
+    setSuccessMessage("Odeme basariyla tamamlandi.");
+  } catch (error) {
+    setPaymentError(error.message || "Odeme tamamlanamadi.");
+  } finally {
+    setIsPaying(false);
+  }
+}
   return (
     <section className={styles.page}>
       <Link href="/showtimes" className={styles.backLink}>
@@ -232,11 +276,15 @@ export default function SeatSelectionClient({ showtimeId }) {
         <span className="ct-eyebrow">Seat Selection</span>
         <h1>Koltuk secimi</h1>
         <p>
-          {showtime?.movieTitle || `Seans #${showtimeId}`} / {showtime?.cinemaName || "Sinema"} / {getShowtimeDate(showtime)} {getShowtimeTime(showtime)}
+          {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
+          {showtime?.cinemaName || "Sinema"} / {getShowtimeDate(showtime)}{" "}
+          {getShowtimeTime(showtime)}
         </p>
       </div>
 
-      {isLoading && <div className={styles.stateBox}>Koltuklar yukleniyor...</div>}
+      {isLoading && (
+        <div className={styles.stateBox}>Koltuklar yukleniyor...</div>
+      )}
 
       {!isLoading && errorMessage && !seats.length && (
         <div className={styles.stateBox} role="alert">
@@ -278,12 +326,24 @@ export default function SeatSelectionClient({ showtimeId }) {
           />
         </div>
       )}
+      {booking && !payment && (
+        <>
+          <div className={styles.successPanel}>
+            <CheckCircle2 size={22} />
+            Booking #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
+            tamamlayabilirsin.
+          </div>
 
-      {booking && (
-        <div className={styles.successPanel}>
-          <CheckCircle2 size={22} /> Booking olustu. Deniz payment/ticket akisini bu booking uzerinden devam ettirecek.
-        </div>
+          <PaymentForm
+            isSubmitting={isPaying}
+            errorMessage={paymentError}
+            onSubmit={handlePayment}
+          />
+        </>
       )}
+
+      {payment && <PaymentResult payment={payment} bookingId={booking.id} />}
+      
     </section>
   );
 }
