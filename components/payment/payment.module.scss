@@ -1,23 +1,31 @@
 .paymentCard,
 .resultCard {
-  width: 100%;
-  max-width: 720px;
+  width: min(100%, 760px);
   margin: 2rem auto 0;
-  padding: 1.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 1rem;
-  background: var(--ct-surface, #ffffff);
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(248, 243, 232, 0.12);
+  border-radius: 1.25rem;
+  color: #f8f3e8;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(247, 198, 91, 0.14), transparent 34%),
+    linear-gradient(145deg, rgba(17, 27, 44, 0.98), rgba(9, 16, 29, 0.98));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
 }
 
 .heading {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-bottom: 1.5rem;
+  color: #f7c65b;
+
+  :global(.ct-eyebrow) {
+    color: #f7c65b;
+  }
 
   h2 {
     margin: 0.25rem 0 0;
+    color: #f8f3e8;
   }
 }
 
@@ -27,29 +35,54 @@
 
   label {
     display: grid;
-    gap: 0.4rem;
-    font-weight: 600;
+    gap: 0.45rem;
+    color: #f8f3e8;
+    font-weight: 800;
+  }
+
+  label > span {
+    color: rgba(248, 243, 232, 0.82);
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
   }
 
   input,
   select {
     width: 100%;
-    padding: 0.8rem 0.9rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 0.65rem;
-    background: #ffffff;
+    min-height: 58px;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(248, 243, 232, 0.16);
+    border-radius: 0.85rem;
+    color: #f8f3e8;
+    background: rgba(248, 243, 232, 0.07);
     font: inherit;
+    font-weight: 750;
+    transition:
+      border-color 180ms ease,
+      background 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  select option {
+    color: #0b1220;
+    background: #f8f3e8;
+  }
+
+  input::placeholder {
+    color: rgba(248, 243, 232, 0.48);
   }
 
   input:focus,
   select:focus {
-    border-color: #64748b;
-    outline: 2px solid rgba(100, 116, 139, 0.2);
+    border-color: rgba(247, 198, 91, 0.82);
+    background: rgba(248, 243, 232, 0.1);
+    box-shadow: 0 0 0 4px rgba(247, 198, 91, 0.14);
+    outline: none;
   }
 
   small {
-    color: #64748b;
-    font-weight: 400;
+    color: rgba(248, 243, 232, 0.62);
+    font-weight: 600;
   }
 
   button {
@@ -60,10 +93,12 @@
 
 .error {
   margin: 0;
-  padding: 0.75rem;
-  border-radius: 0.65rem;
-  background: #fee2e2;
-  color: #991b1b;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: 0.85rem;
+  background: rgba(127, 29, 29, 0.45);
+  color: #fecaca;
+  font-weight: 800;
 }
 
 .spinner {
@@ -78,17 +113,23 @@
 }
 
 .successIcon {
-  color: #15803d;
+  color: #48d597;
+  filter: drop-shadow(0 0 18px rgba(72, 213, 151, 0.24));
 }
 
 .resultHeading {
+  :global(.ct-eyebrow) {
+    color: #f7c65b;
+  }
+
   h2 {
     margin: 0.25rem 0;
+    color: #f8f3e8;
   }
 
   p {
     margin: 0;
-    color: #64748b;
+    color: rgba(248, 243, 232, 0.72);
   }
 }
 
@@ -100,18 +141,38 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(248, 243, 232, 0.1);
   }
 
   dt {
-    font-weight: 600;
+    color: rgba(248, 243, 232, 0.7);
+    font-weight: 800;
   }
 
   dd {
     margin: 0;
+    color: #f8f3e8;
+    font-weight: 850;
     text-align: right;
     overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 640px) {
+  .paymentCard,
+  .resultCard {
+    margin-top: 1.25rem;
+  }
+
+  .resultDetails div {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+  }
+
+  .resultDetails dd {
+    text-align: left;
   }
 }
 

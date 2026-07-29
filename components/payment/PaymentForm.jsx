@@ -4,6 +4,10 @@ import { useState } from "react";
 import { CreditCard, LoaderCircle } from "lucide-react";
 import styles from "./payment.module.scss";
 
+function formatCardNumber(value) {
+  return value.replace(/(.{4})/g, "$1 ").trim();
+}
+
 export default function PaymentForm({
   isSubmitting = false,
   errorMessage = "",
@@ -78,13 +82,14 @@ export default function PaymentForm({
             type="text"
             inputMode="numeric"
             autoComplete="cc-number"
-            placeholder="1234567812345678"
-            value={cardNumber}
+            placeholder="1234 5678 9012 3456"
+            value={formatCardNumber(cardNumber)}
             onChange={handleCardNumberChange}
             disabled={isSubmitting}
+            maxLength={19}
           />
 
-          <small>{cardNumber.length}/16 rakam</small>
+          <small>{cardNumber.length}/16 digits</small>
         </label>
 
         <label>
@@ -93,7 +98,7 @@ export default function PaymentForm({
           <input
             type="text"
             autoComplete="cc-name"
-            placeholder="DENIZ TASAN"
+            placeholder="Enter your name"
             value={cardHolderName}
             onChange={(event) => {
               setCardHolderName(event.target.value);
