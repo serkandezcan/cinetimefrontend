@@ -124,3 +124,39 @@ a {
   }
 }
 
+
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark;
+  padding-right: 2.75rem;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  width: 1.15rem;
+  height: 1.15rem;
+  cursor: pointer;
+  opacity: 0.95;
+  filter: invert(88%) sepia(36%) saturate(792%) hue-rotate(344deg) brightness(103%) contrast(94%);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Make native date/time picker icons readable on the dark CineTime forms. */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  border-radius: 9px;
+  background-color: rgba(247, 198, 91, 0.16);
+  filter: brightness(0) saturate(100%) invert(87%) sepia(34%) saturate(951%) hue-rotate(342deg) brightness(104%) contrast(98%);
+  opacity: 1;
+  padding: 4px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(247, 198, 91, 0.26);
+  filter: brightness(0) saturate(100%) invert(92%) sepia(40%) saturate(970%) hue-rotate(341deg) brightness(108%) contrast(103%);
+}
