@@ -6,16 +6,13 @@ export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.content}>
-        <span className="ct-eyebrow">CineTime MVP Frontend</span>
-        <h1>Filmden koltuga, koltuktan bilete tek akista sinema deneyimi.</h1>
-        <p>
-          Home shell, navigation ve UI sistemi ilk sprintte takimin ortak zemini olsun diye tasarlandi.
-          Her ekip uyesi kendi domain sayfasini bu kabuk uzerine baglayacak.
-        </p>
+        <span className="ct-eyebrow">CineTime</span>
+        <h1>Filmden koltuğa, koltuktan bilete tek akışta sinema deneyimi.</h1>
+        <p>Vizyondaki filmleri keşfet, sana uygun seansı seç, koltuğunu ayır ve biletini birkaç adımda tamamla.</p>
 
         <div className={styles.actions}>
           <Link href="/movies" className="ct-button ct-button-primary">
-            Filmleri kesfet
+            Filmleri keşfet
             <ArrowRight size={18} />
           </Link>
           <Link href="/showtimes" className="ct-button ct-button-ghost">
@@ -25,17 +22,17 @@ export default function Hero() {
 
         <div className={styles.trustRow}>
           <span>
-            <ShieldCheck size={16} /> Backend MVP hazir
+            <ShieldCheck size={16} /> Güvenli rezervasyon
           </span>
-          <span>Auth, booking, payment ve ticket akisi test edildi</span>
+          <span>Film, seans, koltuk ve bilet işlemleri tek akışta</span>
         </div>
       </div>
 
       <div className={styles.posterStage} aria-label="Featured movie preview">
         <Link href="/movies/1" className={styles.posterCard} aria-label="Dune Part Two film detayina git">
-          <div className={styles.posterTopline}>Tonight / 20:30</div>
+          <div className={styles.posterTopline}>Bu akşam / 20:30</div>
           <h2>Dune Part Two</h2>
-          <p>IMAX salonunda koltugunu sec, mock payment ile biletini al.</p>
+          <p>IMAX salonunda koltuğunu seç, biletini hızlıca al.</p>
           <span className={styles.playButton} aria-hidden="true">
             <Play size={18} fill="currentColor" />
           </span>
