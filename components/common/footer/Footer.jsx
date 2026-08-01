@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { FOOTER_LINK_GROUPS, FOOTER_SOCIAL_LINKS } from "@/helpers/footer-links";
 import { FOOTER_MESSAGES } from "@/helpers/messages/footer-messages";
 import styles from "./footer.module.scss";
@@ -75,8 +78,35 @@ const SOCIAL_ICONS = {
   youtube: YouTubeIcon,
 };
 
+function normalizeRole(role) {
+  return String(role ?? "").replace(/^ROLE_/, "").toUpperCase();
+}
+
+function getVisibleFooterGroups(groups, sessionStatus, role) {
+  const isAuthenticated = sessionStatus === "authenticated";
+  const normalizedRole = normalizeRole(role);
+  const isAdmin = normalizedRole === "ADMIN";
+
+  return groups
+    .map((group) => {
+      if (group.title !== "Hesabim") return group;
+
+      const links = group.links.filter((item) => {
+        if (!isAuthenticated) return item.href === "/login" || item.href === "/register";
+        if (item.href === "/login" || item.href === "/register") return false;
+        if (item.href === "/dashboard") return isAdmin;
+        return true;
+      });
+
+      return { ...group, links };
+    })
+    .filter((group) => group.links.length > 0);
+}
+
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { data: session, status } = useSession();
+  const footerGroups = getVisibleFooterGroups(FOOTER_LINK_GROUPS, status, session?.user?.role);
 
   return (
     <footer className={styles.footer}>
@@ -107,7 +137,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.linkGrid}>
-          {FOOTER_LINK_GROUPS.map((group) => (
+          {footerGroups.map((group) => (
             <div key={group.title} className={styles.linkGroup}>
               <h2>{group.title}</h2>
               {group.links.map((item) => (

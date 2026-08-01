@@ -1,0 +1,146 @@
+.card {
+  display: grid;
+  gap: 1.25rem;
+  min-height: 100%;
+  border: 1px solid rgba(248, 243, 232, 0.1);
+  border-radius: 24px;
+  color: #f8f3e8;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(247, 198, 91, 0.13), transparent 36%),
+    linear-gradient(145deg, rgba(17, 27, 44, 0.98), rgba(9, 16, 29, 0.98));
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.28);
+  padding: 1.2rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h3 {
+    margin: 0.25rem 0 0.35rem;
+    color: #f8f3e8;
+    font-size: 1.2rem;
+    font-weight: 950;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(248, 243, 232, 0.62);
+    overflow-wrap: anywhere;
+  }
+}
+
+.eyebrow {
+  color: #f7c65b;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 950;
+}
+
+.statusActive {
+  color: #052e16;
+  background: #86efac;
+}
+
+.statusUsed {
+  color: #111827;
+  background: #cbd5e1;
+}
+
+.statusCancelled {
+  color: #450a0a;
+  background: #fca5a5;
+}
+
+.statusUnknown {
+  color: #0f172a;
+  background: #fde68a;
+}
+
+.details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(248, 243, 232, 0.08);
+    padding-bottom: 0.65rem;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(248, 243, 232, 0.66);
+    font-weight: 850;
+  }
+
+  dd {
+    color: #f8f3e8;
+    font-weight: 900;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+.cancelButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 46px;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: 999px;
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.36);
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(248, 113, 113, 0.62);
+    background: rgba(127, 29, 29, 0.58);
+    outline: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.62;
+  }
+}
+
+@media (max-width: 560px) {
+  .cardHeader,
+  .details div {
+    flex-direction: column;
+  }
+
+  .details dd {
+    text-align: left;
+  }
+}
