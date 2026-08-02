@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .card {
   overflow: hidden;
@@ -128,4 +128,13 @@
   margin: $space-3 0 0;
   color: rgba($color-text, 0.46);
   font-size: 0.9rem;
+}
+
+.hasPoster {
+  background-position: center;
+  background-size: cover;
+
+  &::after {
+    display: none;
+  }
 }

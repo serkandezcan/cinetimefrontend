@@ -1,17 +1,26 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { CalendarDays, Clock3, Star } from "lucide-react";
 import { getMovieStatusLabel } from "@/services/movie-service";
 import styles from "./movie-card.module.scss";
+
+function getPosterStyle(posterUrl) {
+  if (!posterUrl || !String(posterUrl).startsWith("http")) return undefined;
+
+  return {
+    backgroundImage: `linear-gradient(180deg, rgba(7, 17, 31, 0.08), rgba(7, 17, 31, 0.9)), url(${posterUrl})`,
+  };
+}
 
 export default function MovieCard({ movie }) {
   const statusLabel = getMovieStatusLabel(movie.status);
   const releaseYear = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : null;
   const castPreview = Array.isArray(movie.cast) ? movie.cast.slice(0, 2).join(", ") : "";
+  const posterStyle = getPosterStyle(movie.posterUrl);
 
   return (
     <article className={styles.card}>
       <Link href={`/movies/${movie.id}`} className={styles.posterLink} aria-label={`${movie.title} detayina git`}>
-        <div className={styles.posterWrapper}>
+        <div className={`${styles.posterWrapper} ${posterStyle ? styles.hasPoster : ""}`} style={posterStyle}>
           <div className={styles.posterFallback}>
             <span>{movie.genre || "CineTime"}</span>
             <strong>{movie.title}</strong>

@@ -8,6 +8,7 @@ import styles from "./movie-admin-panel.module.scss";
 const initialForm = {
   title: "",
   summary: "",
+  posterUrl: "",
   releaseDate: "",
   duration: "",
   director: "",
@@ -47,6 +48,7 @@ export default function MovieAdminPanel() {
     const payload = {
       title: form.title.trim(),
       summary: form.summary.trim(),
+      posterUrl: form.posterUrl.trim() || null,
       releaseDate: form.releaseDate,
       duration: Number(form.duration),
       director: form.director.trim(),
@@ -86,6 +88,17 @@ export default function MovieAdminPanel() {
         <label className={styles.fullRow}>
           Ozet
           <textarea name="summary" value={form.summary} onChange={handleChange} rows={4} required />
+        </label>
+
+        <label className={styles.fullRow}>
+          Afis URL
+          <input
+            name="posterUrl"
+            type="url"
+            value={form.posterUrl}
+            onChange={handleChange}
+            placeholder="https://image.tmdb.org/t/p/w500/ornek-afis.jpg"
+          />
         </label>
 
         <label>

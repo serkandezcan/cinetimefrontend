@@ -1,10 +1,18 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, Clock3, Star, UserRound } from "lucide-react";
 import { getMovieById, getMovieStatusLabel } from "@/services/movie-service";
 import styles from "./movie-detail.module.scss";
+
+function getPosterStyle(posterUrl) {
+  if (!posterUrl || !String(posterUrl).startsWith("http")) return undefined;
+
+  return {
+    backgroundImage: `linear-gradient(180deg, rgba(7, 17, 31, 0.06), rgba(7, 17, 31, 0.86)), url(${posterUrl})`,
+  };
+}
 
 export default function MovieDetail({ movieId }) {
   const [movie, setMovie] = useState(null);
@@ -55,6 +63,8 @@ export default function MovieDetail({ movieId }) {
     return <section className={styles.page}><div className={styles.stateBox}>Film bulunamadi.</div></section>;
   }
 
+  const posterStyle = getPosterStyle(movie.posterUrl);
+
   return (
     <section className={styles.page}>
       <Link href="/movies" className={styles.backLink}>
@@ -62,7 +72,7 @@ export default function MovieDetail({ movieId }) {
       </Link>
 
       <div className={styles.detailShell}>
-        <div className={styles.posterPanel}>
+        <div className={`${styles.posterPanel} ${posterStyle ? styles.hasPoster : ""}`} style={posterStyle}>
           <span>{movie.genre || "CineTime"}</span>
           <strong>{movie.title}</strong>
         </div>
