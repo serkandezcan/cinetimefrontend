@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .page {
   width: min(100% - 32px, $container-max-width);
@@ -158,4 +158,9 @@
   .posterPanel {
     min-height: 380px;
   }
+}
+
+.hasPoster {
+  background-position: center;
+  background-size: cover;
 }
