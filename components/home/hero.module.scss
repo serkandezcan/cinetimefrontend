@@ -129,7 +129,29 @@
     color: rgba($color-text, 0.68);
     line-height: 1.65;
   }
+  
+  h2,
+  p,
+  .posterTopline
+  {
+    position: relative;
+    z-index: 1;
+  }
 }
+.posterBackdrop {
+  z-index: 0;
+  object-fit: cover;
+}
+
+.posterOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(#07111f, 0.15), rgba(#07111f, 0.92) 85%),
+    linear-gradient(90deg, rgba(#07111f, 0.75), transparent 60%);
+}
+
 
 .posterTopline {
   display: inline-flex;
@@ -181,4 +203,6 @@
     grid-template-columns: 1fr;
     min-height: auto;
   }
+  
+  
 }

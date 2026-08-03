@@ -2,6 +2,8 @@ import Link from "next/link";
 import { CalendarDays, Clock3, Star } from "lucide-react";
 import { getMovieStatusLabel } from "@/services/movie-service";
 import styles from "./movie-card.module.scss";
+import TrailerButton from "@/components/movies/TrailerButton/TrailerButton";
+
 
 function getPosterStyle(posterUrl) {
   if (!posterUrl || !String(posterUrl).startsWith("http")) return undefined;
@@ -19,8 +21,15 @@ export default function MovieCard({ movie }) {
 
   return (
     <article className={styles.card}>
-      <Link href={`/movies/${movie.id}`} className={styles.posterLink} aria-label={`${movie.title} detayina git`}>
-        <div className={`${styles.posterWrapper} ${posterStyle ? styles.hasPoster : ""}`} style={posterStyle}>
+      <Link
+        href={`/movies/${movie.id}`}
+        className={styles.posterLink}
+        aria-label={`${movie.title} detayina git`}
+      >
+        <div
+          className={`${styles.posterWrapper} ${posterStyle ? styles.hasPoster : ""}`}
+          style={posterStyle}
+        >
           <div className={styles.posterFallback}>
             <span>{movie.genre || "CineTime"}</span>
             <strong>{movie.title}</strong>
@@ -34,7 +43,9 @@ export default function MovieCard({ movie }) {
           <h2 className={styles.title}>{movie.title}</h2>
         </Link>
 
-        <p className={styles.summary}>{movie.summary || "Film ozeti yakinda eklenecek."}</p>
+        <p className={styles.summary}>
+          {movie.summary || "Film ozeti yakinda eklenecek."}
+        </p>
 
         <div className={styles.metaGrid}>
           {releaseYear && (
@@ -49,12 +60,16 @@ export default function MovieCard({ movie }) {
           ) : null}
           {movie.rating ? (
             <span className={styles.rating}>
-              <Star size={15} fill="currentColor" /> {movie.rating}
+              <Star size={15} fill='currentColor' /> {movie.rating.toFixed(1)}
             </span>
           ) : null}
         </div>
 
         {castPreview && <p className={styles.cast}>Oyuncular: {castPreview}</p>}
+
+        <div className={styles.trailerRow}>
+          <TrailerButton movieTitle={movie.title} />
+        </div>
       </div>
     </article>
   );
