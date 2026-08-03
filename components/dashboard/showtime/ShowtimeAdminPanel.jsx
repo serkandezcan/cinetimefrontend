@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getMovies } from "@/services/movie-service";
-import { getCinemas } from "@/services/cinema-service";
+import { getCinemas, getCinemaHalls } from "@/services/cinema-service";
 import { cancelShowtime, createShowtime, getShowtimes, getShowtimeStatusLabel } from "@/services/showtime-service";
 import styles from "./showtime-admin-panel.module.scss";
 
@@ -23,16 +23,31 @@ function formatTime(value) {
   return value.slice(0, 5);
 }
 
+function normalizeList(value) {
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.content)) return value.content;
+  return [];
+}
+
+function getHallOptionLabel(hall) {
+  const type = hall.hallType ? ` / ${hall.hallType}` : "";
+  const capacity = hall.capacity ? ` / ${hall.capacity} koltuk` : "";
+  return `${hall.name}${type}${capacity}`;
+}
+
 export default function ShowtimeAdminPanel() {
   const { data: session } = useSession();
   const [form, setForm] = useState(INITIAL_FORM);
   const [movies, setMovies] = useState([]);
   const [cinemas, setCinemas] = useState([]);
+  const [halls, setHalls] = useState([]);
   const [showtimes, setShowtimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHallsLoading, setIsHallsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [hallErrorMessage, setHallErrorMessage] = useState("");
 
   async function loadAdminData() {
     setIsLoading(true);
@@ -46,12 +61,29 @@ export default function ShowtimeAdminPanel() {
       ]);
 
       setMovies(moviePage.content || []);
-      setCinemas(cinemaList || []);
+      setCinemas(normalizeList(cinemaList));
       setShowtimes(Array.isArray(showtimeList) ? showtimeList : []);
     } catch (error) {
       setErrorMessage(error.message || "Admin seans verileri yuklenemedi.");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadHallsForCinema(cinemaId) {
+    setHalls([]);
+    setHallErrorMessage("");
+
+    if (!cinemaId) return;
+
+    setIsHallsLoading(true);
+    try {
+      const hallList = await getCinemaHalls(cinemaId);
+      setHalls(normalizeList(hallList));
+    } catch (error) {
+      setHallErrorMessage(error.message || "Salonlar yuklenemedi.");
+    } finally {
+      setIsHallsLoading(false);
     }
   }
 
@@ -68,7 +100,7 @@ export default function ShowtimeAdminPanel() {
 
         if (!isMounted) return;
         setMovies(moviePage.content || []);
-        setCinemas(cinemaList || []);
+        setCinemas(normalizeList(cinemaList));
         setShowtimes(Array.isArray(showtimeList) ? showtimeList : []);
       } catch (error) {
         if (isMounted) setErrorMessage(error.message || "Admin seans verileri yuklenemedi.");
@@ -86,6 +118,13 @@ export default function ShowtimeAdminPanel() {
 
   function handleChange(event) {
     const { name, value } = event.target;
+
+    if (name === "cinemaId") {
+      setForm((current) => ({ ...current, cinemaId: value, hallId: "" }));
+      void loadHallsForCinema(value);
+      return;
+    }
+
     setForm((current) => ({ ...current, [name]: value }));
   }
 
@@ -109,6 +148,7 @@ export default function ShowtimeAdminPanel() {
       const created = await createShowtime(payload, session?.accessToken);
       setMessage(`${created?.movieTitle || "Seans"} basariyla olusturuldu.`);
       setForm(INITIAL_FORM);
+      setHalls([]);
       await loadAdminData();
     } catch (error) {
       setErrorMessage(error.message || "Seans olusturulamadi.");
@@ -130,12 +170,20 @@ export default function ShowtimeAdminPanel() {
     }
   }
 
+  const hallPlaceholder = !form.cinemaId
+    ? "Once sinema sec"
+    : isHallsLoading
+      ? "Salonlar yukleniyor..."
+      : halls.length
+        ? "Salon sec"
+        : "Bu sinemada salon yok";
+
   return (
     <section className={styles.page}>
       <div className={styles.header}>
         <span className="ct-eyebrow">Admin Showtime Domain</span>
         <h1>Seans yonetimi</h1>
-        <p>Film, salon, tarih ve fiyat bilgisini girerek yeni seans olustur.</p>
+        <p>Film, sinema, salon, tarih ve fiyat bilgisini girerek yeni seans olustur.</p>
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -150,9 +198,9 @@ export default function ShowtimeAdminPanel() {
         </label>
 
         <label>
-          Sinema referansi
-          <select name="cinemaId" value={form.cinemaId} onChange={handleChange}>
-            <option value="">Bilgi amacli sec</option>
+          Sinema
+          <select name="cinemaId" value={form.cinemaId} onChange={handleChange} required>
+            <option value="">Sinema sec</option>
             {cinemas.map((cinema) => (
               <option key={cinema.id} value={cinema.id}>{cinema.name}</option>
             ))}
@@ -160,8 +208,20 @@ export default function ShowtimeAdminPanel() {
         </label>
 
         <label>
-          Hall ID
-          <input name="hallId" type="number" min="1" value={form.hallId} onChange={handleChange} required />
+          Salon
+          <select
+            name="hallId"
+            value={form.hallId}
+            onChange={handleChange}
+            disabled={!form.cinemaId || isHallsLoading || Boolean(hallErrorMessage) || halls.length === 0}
+            required
+          >
+            <option value="">{hallPlaceholder}</option>
+            {halls.map((hall) => (
+              <option key={hall.id} value={hall.id}>{getHallOptionLabel(hall)}</option>
+            ))}
+          </select>
+          {hallErrorMessage && <span className={styles.fieldHint} role="alert">{hallErrorMessage}</span>}
         </label>
 
         <label>
@@ -239,4 +299,3 @@ export default function ShowtimeAdminPanel() {
     </section>
   );
 }
-

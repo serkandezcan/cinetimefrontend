@@ -1,8 +1,10 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { CalendarDays, MapPin, Ticket } from "lucide-react";
 import Hero from "@/components/home/Hero";
 import MovieStrip from "@/components/home/MovieStrip";
 import styles from "./page.module.scss";
+
+export const dynamic = "force-dynamic";
 
 const quickActions = [
   {
@@ -24,7 +26,6 @@ const quickActions = [
     icon: CalendarDays,
   },
 ];
-
 
 export default function HomePage() {
   return (
@@ -54,7 +55,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <MovieStrip  />
+      <MovieStrip />
     </div>
   );
 }
