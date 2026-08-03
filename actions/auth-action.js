@@ -6,6 +6,7 @@ import { response, transformFormDataToJSON, transformYupErrors, YupValidationErr
 import { AuthError } from "next-auth";
 
 export const loginAction = async (prevState, formData) => {
+  
   const fields = transformFormDataToJSON(formData);
 
   try {

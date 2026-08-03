@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { createMovie, MOVIE_STATUS } from "@/services/movie-service";
 import styles from "./movie-admin-panel.module.scss";
+import TmdbImportButton from "@/components/admin/TmdbImportButton";
+
 
 const initialForm = {
   title: "",
@@ -77,6 +79,7 @@ export default function MovieAdminPanel() {
         <span className="ct-eyebrow">Admin Movie Domain</span>
         <h1>Film ekle</h1>
         <p>Backend `POST /api/movies` endpointi icin ilk admin create formu.</p>
+        <TmdbImportButton />
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>

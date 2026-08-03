@@ -36,6 +36,8 @@
 
 .movieCard {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 320px;
   padding: $space-4;
   overflow: hidden;
@@ -54,7 +56,7 @@
   h3 {
     position: relative;
     z-index: 1;
-    margin-top: 130px;
+    margin-top: 165px;
     margin-bottom: $space-2;
     font-size: 1.55rem;
     font-weight: 950;
@@ -66,6 +68,14 @@
     z-index: 1;
     color: rgba($color-text, 0.62);
   }
+}
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-2;
+  margin-top: auto; // kart ne kadar uzasa da footer'i en alta yapistirir
+  padding-top: $space-3;
 }
 
 .rank {
@@ -90,6 +100,10 @@
     rgba($color-text, 0.1);
   box-shadow: 0 28px 60px rgba($color-red, 0.24);
   transform: rotate(7deg);
+}
+
+.posterImg {
+  object-fit: cover;
 }
 
 .rating {
@@ -117,4 +131,10 @@
   .movieGrid {
     grid-template-columns: 1fr;
   }
+}
+
+.trailerButtonContainer {
+  
+  
+  
 }
