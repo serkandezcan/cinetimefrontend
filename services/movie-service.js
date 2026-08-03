@@ -62,13 +62,15 @@ export function normalizeMoviePage(data) {
   };
 }
 
-export async function getMovies({ page = 0, size = 12, sortBy = "id", order = "ASC" } = {}) {
+export async function getMovies({ page = 0, size = 12, sortBy = "id", order = "ASC", q } = {}) {
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),
-    sortBy,
-    order,
+    sort: sortBy,
+    type: order,
   });
+
+  if (q) params.set("q", q);
 
   const data = await apiClient.get(`${API_ROUTES.movies.list}?${params}`);
   return normalizeMoviePage(data);
@@ -82,10 +84,20 @@ export async function createMovie(payload, token) {
   return apiClient.post(API_ROUTES.movies.create, payload, { token });
 }
 
+export async function updateMovie(id, payload, token) {
+  return apiClient.put(API_ROUTES.movies.update(id), payload, { token });
+}
+
+export async function deleteMovie(id, token) {
+  return apiClient.delete(API_ROUTES.movies.delete(id), { token });
+}
+
 const movieService = {
   getMovies,
   getMovieById,
   createMovie,
+  updateMovie,
+  deleteMovie,
   getMovieStatusLabel,
   normalizeMovieStatus,
 };
