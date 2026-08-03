@@ -41,7 +41,6 @@ export default function HomePage() {
         <div className={styles.sectionHeader}>
           <span className="ct-eyebrow">Baslangic rotasi</span>
           <h2 id="quick-actions-title">Bilet alma akisina hizli giris</h2>
-          <p>Frontend ekibi bu kabuk uzerinden sayfalari parca parca backend ile baglayacak.</p>
         </div>
 
         <div className={styles.quickGrid}>
