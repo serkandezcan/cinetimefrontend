@@ -25,12 +25,6 @@ const quickActions = [
   },
 ];
 
-const featuredMovies = [
-  { title: "Dune Part Two", meta: "IMAX / Sci-Fi", rating: "8.6", href: "/movies/1" },
-  { title: "Inside Out 2", meta: "2D / Animation", rating: "8.0", href: "/movies" },
-  { title: "Furiosa", meta: "4DX / Action", rating: "7.8", href: "/movies" },
-  { title: "Kingdom", meta: "Dolby / Adventure", rating: "7.5", href: "/movies" },
-];
 
 export default function HomePage() {
   return (
@@ -60,7 +54,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <MovieStrip movies={featuredMovies} />
+      <MovieStrip  />
     </div>
   );
 }
