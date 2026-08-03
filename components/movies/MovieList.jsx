@@ -77,7 +77,6 @@ export default function MovieList() {
       <div className={styles.header}>
         <span className="ct-eyebrow">Movie Domain</span>
         <h1>Filmler</h1>
-        <p>Backendden gelen filmleri listele, filtrele ve detay sayfasina gec.</p>
       </div>
 
       <div className={styles.toolbar}>
