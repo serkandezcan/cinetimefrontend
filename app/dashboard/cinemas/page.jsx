@@ -5,6 +5,8 @@ import CinemaList from "@/components/cinemas/CinemaList";
 import { getCinemas } from "@/services/cinema-service";
 import { CINEMA_MESSAGES } from "@/helpers/messages/cinema-messages";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: CINEMA_MESSAGES.admin.cinema.pageTitle };
 
 export default async function Page() {

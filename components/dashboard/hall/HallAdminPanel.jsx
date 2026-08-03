@@ -114,7 +114,7 @@ export default function HallAdminPanel({ cinemas = [], loadError }) {
           className={styles.select}
         >
           <option value="" disabled>
-            —
+            Sinema sec
           </option>
           {cinemas.map((cinema) => (
             <option key={cinema.id} value={cinema.id}>
@@ -149,7 +149,7 @@ export default function HallAdminPanel({ cinemas = [], loadError }) {
           className={styles.select}
         >
           <option value="" disabled>
-            —
+            Salon tipi sec
           </option>
           {HALL_TYPE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>

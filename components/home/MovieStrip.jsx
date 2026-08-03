@@ -1,25 +1,34 @@
-﻿import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { Star } from "lucide-react";
-import styles from "./movie-strip.module.scss";
-import { getMovies } from "@/services/movie-service";
 import TrailerButton from "../movies/TrailerButton/TrailerButton";
+import { getMovies } from "@/services/movie-service";
+import styles from "./movie-strip.module.scss";
 
 export default async function MovieStrip() {
-  const { content: movies } = await getMovies({
-    size: 4,
-    sortBy: "id",
-    order: "DESC",
-  });
+  let movies = [];
+
+  try {
+    const { content } = await getMovies({
+      size: 4,
+      sortBy: "id",
+      order: "DESC",
+    });
+    movies = content || [];
+  } catch {
+    movies = [];
+  }
+
+  if (!movies.length) return null;
 
   return (
-    <section className={styles.section} aria-labelledby='featured-movies-title'>
+    <section className={styles.section} aria-labelledby="featured-movies-title">
       <div className={styles.headerRow}>
         <div>
-          <span className='ct-eyebrow'>Vitrin</span>
-          <h2 id='featured-movies-title'>One cikan filmler</h2>
+          <span className="ct-eyebrow">Vitrin</span>
+          <h2 id="featured-movies-title">One cikan filmler</h2>
         </div>
-        <Link href='/movies' className={styles.allLink}>
+        <Link href="/movies" className={styles.allLink}>
           Tum filmler
         </Link>
       </div>
@@ -40,7 +49,7 @@ export default async function MovieStrip() {
                   alt={movie.title}
                   fill
                   className={styles.posterImg}
-                  sizes='120px'
+                  sizes="120px"
                 />
               )}
             </div>
@@ -52,7 +61,7 @@ export default async function MovieStrip() {
 
             <div className={styles.cardFooter}>
               <span className={styles.rating}>
-                <Star size={15} fill='currentColor' />{" "}
+                <Star size={15} fill="currentColor" />{" "}
                 {movie.rating != null ? Number(movie.rating).toFixed(1) : "-"}
               </span>
               <TrailerButton movieTitle={movie.title} />

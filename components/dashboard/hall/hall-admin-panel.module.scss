@@ -36,6 +36,16 @@
   font-size: $font-size-base;
   height: $height-input;
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  option {
+    color: #111827;
+    background: #fffaf0;
+  }
+
   &:focus {
     outline: none;
     border-color: $color-gold;
