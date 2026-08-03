@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .section {
   width: min(100% - 32px, $container-max-width);
@@ -100,6 +100,11 @@
     rgba($color-text, 0.1);
   box-shadow: 0 28px 60px rgba($color-red, 0.24);
   transform: rotate(7deg);
+}
+
+.hasPoster {
+  background-position: center;
+  background-size: cover;
 }
 
 .posterImg {

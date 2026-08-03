@@ -1,35 +1,48 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Play, ShieldCheck } from "lucide-react";
 import { getMovies } from "@/services/movie-service";
 import styles from "./hero.module.scss";
+
+const FEATURED_TITLE = "Dune Part Two";
+
+function getPosterStyle(posterUrl) {
+  if (!posterUrl || !String(posterUrl).startsWith("http")) return undefined;
+
+  return {
+    backgroundImage: `linear-gradient(90deg, rgba(7, 17, 31, 0.86), rgba(7, 17, 31, 0.42)), linear-gradient(180deg, rgba(7, 17, 31, 0.2), rgba(7, 17, 31, 0.9)), url(${posterUrl})`,
+  };
+}
+
+function pickFeaturedMovie(movies = []) {
+  return movies.find((movie) => movie.title?.toLowerCase() === FEATURED_TITLE.toLowerCase()) || movies[0] || null;
+}
 
 export default async function Hero() {
   let featuredMovie = null;
 
   try {
     const { content: movies } = await getMovies({
-      size: 1,
+      size: 50,
       sortBy: "id",
       order: "DESC",
     });
-    featuredMovie = movies?.[0] || null;
+    featuredMovie = pickFeaturedMovie(movies);
   } catch {
     return null;
   }
 
   if (!featuredMovie) return null;
 
-  const backdropUrl = featuredMovie.posterUrl || null;
+  const posterStyle = getPosterStyle(featuredMovie.posterUrl);
 
   return (
     <section className={styles.hero}>
       <div className={styles.content}>
         <span className="ct-eyebrow">CineTime</span>
-        <h1>Filmden koltuga, koltuktan bilete tek akista sinema deneyimi.</h1>
+        <h1>Seansini bul, koltugunu sec, biletini guvenle al.</h1>
         <p>
-          Vizyondaki filmleri kesfet, sana uygun seansi sec, koltugunu ayir ve
-          biletini birkac adimda tamamla.
+          Vizyondaki filmleri incele, sana uygun seansi sec ve biletini birkac
+          adimda tamamla.
         </p>
 
         <div className={styles.actions}>
@@ -46,26 +59,18 @@ export default async function Hero() {
           <span>
             <ShieldCheck size={16} /> Guvenli rezervasyon
           </span>
-          <span>Film, seans, koltuk ve bilet islemleri tek akista</span>
+          <span>Film, seans, koltuk ve bilet islemleri tek yerde</span>
         </div>
       </div>
 
       <div className={styles.posterStage} aria-label="Featured movie preview">
         <Link
           href={`/movies/${featuredMovie.id}`}
-          className={styles.posterCard}
+          className={`${styles.posterCard} ${posterStyle ? styles.hasPoster : ""}`}
+          style={posterStyle}
           aria-label={`${featuredMovie.title} film detayina git`}
         >
-          {backdropUrl && (
-            <Image
-              src={backdropUrl}
-              alt={featuredMovie.title}
-              fill
-              priority
-              className={styles.posterBackdrop}
-            />
-          )}
-          <div className={styles.posterTopline}>Bu aksam / 20:30</div>
+          <div className={styles.posterTopline}>Gosterimde</div>
           <h2>{featuredMovie.title}</h2>
           <p>
             {featuredMovie.specialHalls

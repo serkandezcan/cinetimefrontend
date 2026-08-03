@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .page {
   width: min(100% - 32px, $container-max-width);
@@ -50,6 +50,11 @@
     color: $color-text;
     background: rgba($color-bg, 0.52);
     outline: 0;
+  }
+
+  select option {
+    color: #111827;
+    background: #fffaf0;
   }
 
   textarea {
