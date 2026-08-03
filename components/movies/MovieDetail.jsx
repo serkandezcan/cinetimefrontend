@@ -27,16 +27,16 @@ export default function MovieDetail({ movieId }) {
       setIsLoading(true);
       setErrorMessage("");
 
-     try {
-       const data = await getMovieById(movieId);
-       console.log("MOVIE DATA:", data); // 👈 GEÇİCİ, sonra silinecek
-       if (isMounted) setMovie(data);
-     } catch (error) {
-       if (isMounted)
-         setErrorMessage(error.message || "Film detayi alinamadi.");
-     } finally {
-       if (isMounted) setIsLoading(false);
-     }
+      try {
+        const data = await getMovieById(movieId);
+        if (isMounted) setMovie(data);
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(error.message || "Film detayi alinamadi.");
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     }
 
     loadMovie();
@@ -88,7 +88,7 @@ export default function MovieDetail({ movieId }) {
           <div className={styles.factGrid}>
             <span><CalendarDays size={17} /> {movie.releaseDate || "Tarih yok"}</span>
             <span><Clock3 size={17} /> {movie.duration ? `${movie.duration} dk` : "Sure yok"}</span>
-            <span><Star size={17} fill="currentColor" /> {movie.rating.toFixed(1) || "Puan yok"}</span>
+            <span><Star size={17} fill="currentColor" /> {movie.rating != null ? Number(movie.rating).toFixed(1) : "Puan yok"}</span>
             <span><UserRound size={17} /> {movie.director || "Yonetmen yok"}</span>
           </div>
 
@@ -105,7 +105,7 @@ export default function MovieDetail({ movieId }) {
           )}
 
           <div className={styles.actions}>
-            <TrailerButton movieTitle={movie.title} />
+            <TrailerButton movieTitle={movie.title} trailerUrl={movie.trailerUrl} />
             <Link href={`/showtimes?movieId=${movie.id}`} className="ct-button ct-button-primary">
               Seanslari gor
             </Link>

@@ -58,9 +58,9 @@ export default function MovieCard({ movie }) {
               <Clock3 size={15} /> {movie.duration} dk
             </span>
           ) : null}
-          {movie.rating ? (
+          {movie.rating != null ? (
             <span className={styles.rating}>
-              <Star size={15} fill='currentColor' /> {movie.rating.toFixed(1)}
+              <Star size={15} fill="currentColor" /> {Number(movie.rating).toFixed(1)}
             </span>
           ) : null}
         </div>
@@ -68,7 +68,7 @@ export default function MovieCard({ movie }) {
         {castPreview && <p className={styles.cast}>Oyuncular: {castPreview}</p>}
 
         <div className={styles.trailerRow}>
-          <TrailerButton movieTitle={movie.title} />
+          <TrailerButton movieTitle={movie.title} trailerUrl={movie.trailerUrl} />
         </div>
       </div>
     </article>

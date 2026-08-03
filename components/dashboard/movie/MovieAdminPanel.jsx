@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import TmdbImportButton from "@/components/admin/TmdbImportButton";
 import { createMovie, MOVIE_STATUS } from "@/services/movie-service";
 import styles from "./movie-admin-panel.module.scss";
-import TmdbImportButton from "@/components/admin/TmdbImportButton";
-
 
 const initialForm = {
   title: "",
   summary: "",
   posterUrl: "",
+  trailerUrl: "",
   releaseDate: "",
   duration: "",
   director: "",
@@ -51,6 +51,7 @@ export default function MovieAdminPanel() {
       title: form.title.trim(),
       summary: form.summary.trim(),
       posterUrl: form.posterUrl.trim() || null,
+      trailerUrl: form.trailerUrl.trim() || null,
       releaseDate: form.releaseDate,
       duration: Number(form.duration),
       director: form.director.trim(),
@@ -78,7 +79,7 @@ export default function MovieAdminPanel() {
       <div className={styles.header}>
         <span className="ct-eyebrow">Admin Movie Domain</span>
         <h1>Film ekle</h1>
-        <p>Backend `POST /api/movies` endpointi icin ilk admin create formu.</p>
+        <p>Yeni filmi katalog ve vitrin akisi icin kaydet; afis ve fragman URL alanlari opsiyoneldir.</p>
         <TmdbImportButton />
       </div>
 
@@ -101,6 +102,17 @@ export default function MovieAdminPanel() {
             value={form.posterUrl}
             onChange={handleChange}
             placeholder="https://image.tmdb.org/t/p/w500/ornek-afis.jpg"
+          />
+        </label>
+
+        <label className={styles.fullRow}>
+          Fragman URL
+          <input
+            name="trailerUrl"
+            type="url"
+            value={form.trailerUrl}
+            onChange={handleChange}
+            placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           />
         </label>
 

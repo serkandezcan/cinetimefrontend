@@ -138,6 +138,11 @@
     z-index: 1;
   }
 }
+.hasPoster {
+  background-position: center;
+  background-size: cover;
+}
+
 .posterBackdrop {
   z-index: 0;
   object-fit: cover;
