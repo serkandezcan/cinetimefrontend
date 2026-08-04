@@ -1,9 +1,5 @@
-import Link from "next/link";
-import { ArrowRight, Clock3, Play, Star } from "lucide-react";
 import { getMovies } from "@/services/movie-service";
-import styles from "./hero.module.scss";
-
-const FEATURED_TITLE = "Dune Part Two";
+import HeroCarousel from "./HeroCarousel";
 
 const FALLBACK_MOVIES = [
   {
@@ -37,50 +33,17 @@ const FALLBACK_MOVIES = [
     specialHalls: "4DX",
     href: "/movies",
   },
+  {
+    id: "fallback-kingdom",
+    title: "Kingdom",
+    summary: "Kralligin kaderini belirleyen buyuk macera.",
+    duration: 132,
+    rating: 7.5,
+    genre: "Macera",
+    specialHalls: "Dolby",
+    href: "/movies",
+  },
 ];
-
-function isRealMovieId(id) {
-  return id !== undefined && id !== null && !String(id).startsWith("fallback-");
-}
-
-function getMovieHref(movie) {
-  if (movie.href) return movie.href;
-  return isRealMovieId(movie.id) ? `/movies/${movie.id}` : "/movies";
-}
-
-function getTicketHref(movie) {
-  return isRealMovieId(movie.id) ? `/showtimes?movieId=${movie.id}` : "/showtimes";
-}
-
-function getDurationLabel(duration) {
-  const minutes = Number(duration);
-  if (!Number.isFinite(minutes) || minutes <= 0) return "Seanslari incele";
-
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  if (!hours) return `${rest} dk`;
-  return `${hours} sa ${rest} dk`;
-}
-
-function getHeroStyle(movie) {
-  if (!movie?.posterUrl || !String(movie.posterUrl).startsWith("http")) return undefined;
-
-  return {
-    backgroundImage: `linear-gradient(90deg, rgba(7, 17, 31, 0.95) 0%, rgba(7, 17, 31, 0.74) 42%, rgba(7, 17, 31, 0.26) 100%), linear-gradient(180deg, rgba(7, 17, 31, 0.12), rgba(7, 17, 31, 0.95)), url(${movie.posterUrl})`,
-  };
-}
-
-function getPosterStyle(movie) {
-  if (!movie?.posterUrl || !String(movie.posterUrl).startsWith("http")) return undefined;
-
-  return {
-    backgroundImage: `linear-gradient(180deg, rgba(7, 17, 31, 0.08), rgba(7, 17, 31, 0.28)), url(${movie.posterUrl})`,
-  };
-}
-
-function pickFeaturedMovie(movies = []) {
-  return movies.find((movie) => movie.title?.toLowerCase() === FEATURED_TITLE.toLowerCase()) || movies[0] || FALLBACK_MOVIES[0];
-}
 
 function buildHeroMovies(movies = []) {
   const merged = [];
@@ -93,7 +56,7 @@ function buildHeroMovies(movies = []) {
 
     seenTitles.add(titleKey);
     merged.push(movie);
-    if (merged.length === 4) return merged;
+    if (merged.length === 8) return merged;
   }
 
   return merged;
@@ -113,66 +76,5 @@ export default async function Hero() {
     movies = [];
   }
 
-  const heroMovies = buildHeroMovies(movies);
-  const featuredMovie = pickFeaturedMovie(heroMovies);
-  const sideMovies = heroMovies.filter((movie) => movie.title !== featuredMovie.title).slice(0, 3);
-  const heroStyle = getHeroStyle(featuredMovie);
-
-  return (
-    <section className={`${styles.hero} ${heroStyle ? styles.hasBackdrop : ""}`} style={heroStyle}>
-      <div className={styles.inner}>
-        <div className={styles.content}>
-          <span className={styles.badge}>Vizyonda</span>
-          <h1>{featuredMovie.title} vizyonda!</h1>
-          <p>{featuredMovie.summary || "Vizyondaki filmi incele, uygun seansi sec ve koltugunu birkac adimda ayir."}</p>
-
-          <div className={styles.metaRow} aria-label="Film bilgileri">
-            {featuredMovie.rating != null && (
-              <span>
-                <Star size={18} fill="currentColor" /> {Number(featuredMovie.rating).toFixed(1)}
-              </span>
-            )}
-            <span>
-              <Clock3 size={18} /> {getDurationLabel(featuredMovie.duration)}
-            </span>
-            {featuredMovie.specialHalls && <span>{featuredMovie.specialHalls}</span>}
-          </div>
-
-          <div className={styles.actions}>
-            <Link href={getTicketHref(featuredMovie)} className="ct-button ct-button-primary">
-              Hemen bilet al
-              <ArrowRight size={18} />
-            </Link>
-            <Link href={getMovieHref(featuredMovie)} className="ct-button ct-button-ghost">
-              Incele
-            </Link>
-          </div>
-        </div>
-
-        <Link href={getMovieHref(featuredMovie)} className={styles.playButton} aria-label={`${featuredMovie.title} detayini ac`}>
-          <Play size={34} fill="currentColor" />
-        </Link>
-
-        <aside className={styles.posterRail} aria-label="Diger vizyon filmleri">
-          {sideMovies.map((movie) => {
-            const posterStyle = getPosterStyle(movie);
-
-            return (
-              <Link key={movie.id || movie.title} href={getMovieHref(movie)} className={styles.posterCard}>
-                <span className={`${styles.posterImage} ${posterStyle ? styles.withPoster : ""}`} style={posterStyle}>
-                  {!posterStyle && <strong>{movie.title}</strong>}
-                </span>
-                <span className={styles.posterTitle}>{movie.title}</span>
-              </Link>
-            );
-          })}
-        </aside>
-
-        <div className={styles.heroFooter} aria-hidden="true">
-          <span>1 / {Math.max(heroMovies.length, 1)}</span>
-          <span className={styles.footerLine} />
-        </div>
-      </div>
-    </section>
-  );
+  return <HeroCarousel movies={buildHeroMovies(movies)} />;
 }
