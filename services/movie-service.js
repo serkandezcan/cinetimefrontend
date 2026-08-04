@@ -62,7 +62,7 @@ export function normalizeMoviePage(data) {
   };
 }
 
-export async function getMovies({ page = 0, size = 12, sortBy = "id", order = "ASC", q } = {}) {
+export async function getMovies({ page = 0, size = 12, sortBy = "createdAt", order = "DESC", q } = {}) {
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),

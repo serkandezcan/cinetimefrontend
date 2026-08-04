@@ -29,7 +29,7 @@ export default function MovieList() {
     setErrorMessage("");
 
     try {
-      const page = await getMovies({ size: 24, sortBy: "id", order: "ASC" });
+      const page = await getMovies({ size: 24, sortBy: "createdAt", order: "DESC" });
       setMovies(page.content);
     } catch (error) {
       setErrorMessage(error.message || "Filmler yuklenirken bir hata olustu.");
@@ -43,7 +43,7 @@ export default function MovieList() {
 
     async function loadInitialMovies() {
       try {
-        const page = await getMovies({ size: 24, sortBy: "id", order: "ASC" });
+        const page = await getMovies({ size: 24, sortBy: "createdAt", order: "DESC" });
         if (isMounted) setMovies(page.content);
       } catch (error) {
         if (isMounted) setErrorMessage(error.message || "Filmler yuklenirken bir hata olustu.");
