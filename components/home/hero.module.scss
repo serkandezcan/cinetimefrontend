@@ -2,46 +2,111 @@
 
 .hero {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-  gap: clamp(2rem, 5vw, 5rem);
-  align-items: center;
-  width: min(100% - 32px, $container-max-width);
   min-height: calc(100svh - #{$height-header-desktop});
-  margin: 0 auto;
-  padding: clamp(3rem, 8vw, 7rem) 0;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(#07111f, 0.98) 0%, rgba(#07111f, 0.82) 48%, rgba(#2a1218, 0.64) 100%),
+    radial-gradient(circle at 72% 34%, rgba($color-gold, 0.25), transparent 28%),
+    linear-gradient(135deg, #07111f 0%, #0b1625 48%, #26111d 100%);
+  background-position: center;
+  background-size: cover;
 
   &::before {
     position: absolute;
-    inset: 6% auto auto -18%;
-    width: 420px;
-    height: 420px;
+    inset: 0;
     content: "";
-    background: radial-gradient(circle, rgba($color-gold, 0.18), transparent 68%);
-    filter: blur(8px);
+    background:
+      radial-gradient(circle at 24% 50%, rgba($color-gold, 0.24), transparent 18%),
+      linear-gradient(180deg, rgba(#000, 0.08), rgba(#000, 0.42));
+    pointer-events: none;
+  }
+
+  &::after {
+    position: absolute;
+    inset: auto 0 0;
+    height: 34%;
+    content: "";
+    background: linear-gradient(180deg, transparent, rgba(#07111f, 0.95));
     pointer-events: none;
   }
 }
 
-.content {
+.hasBackdrop {
+  background-position: center;
+  background-size: cover;
+}
+
+.inner {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(300px, 0.58fr);
+  gap: clamp(1.75rem, 4vw, 4rem);
+  align-items: center;
+  width: min(100% - 32px, $container-max-width);
+  min-height: calc(100svh - #{$height-header-desktop});
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(3rem, 7vw, 5rem);
+}
+
+.content {
+  max-width: 760px;
 
   h1 {
-    max-width: 780px;
+    max-width: 880px;
     margin: $space-3 0;
     color: $color-text;
-    font-size: clamp(3rem, 8vw, 6.7rem);
+    font-size: clamp(3.4rem, 7vw, 6.2rem);
     font-weight: 950;
-    letter-spacing: -0.075em;
-    line-height: 0.92;
+    letter-spacing: -0.07em;
+    line-height: 0.95;
+    text-wrap: balance;
   }
 
   p {
-    max-width: 650px;
-    color: rgba($color-text, 0.7);
-    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    max-width: 620px;
+    color: rgba($color-text, 0.74);
+    font-size: clamp(1.05rem, 2vw, 1.24rem);
+    font-weight: 650;
     line-height: 1.75;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.62rem 1.1rem;
+  border-radius: $radius-pill;
+  color: $color-text;
+  background: rgba(#000, 0.52);
+  box-shadow: inset 0 0 0 1px rgba($color-gold, 0.18);
+  font-size: 0.82rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin: $space-4 0;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 42px;
+    padding: 0.55rem 0.95rem;
+    border: 1px solid rgba($color-text, 0.14);
+    border-radius: $radius-pill;
+    color: $color-text;
+    background: rgba(#000, 0.36);
+    backdrop-filter: blur(14px);
+    font-weight: 900;
+  }
+
+  svg {
+    color: $color-gold;
   }
 }
 
@@ -49,165 +114,155 @@
   display: flex;
   flex-wrap: wrap;
   gap: $space-2;
-  margin: $space-4 0;
 }
 
-.trustRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2;
-  color: rgba($color-text, 0.58);
-  font-size: 0.95rem;
-
-  span:first-child {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: $color-gold;
-  }
-}
-
-.posterStage {
-  position: relative;
+.playButton {
   display: grid;
-  gap: $space-3;
-}
-
-.posterCard {
-  position: relative;
-  display: block;
-  color: inherit;
+  width: clamp(5rem, 8vw, 7.5rem);
+  height: clamp(5rem, 8vw, 7.5rem);
+  place-items: center;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: 50%;
+  color: $color-text;
+  background: rgba(#000, 0.54);
+  box-shadow: 0 26px 70px rgba(#000, 0.38);
   text-decoration: none;
-  cursor: pointer;
-  transition: transform $transition-base, border-color $transition-base, box-shadow $transition-base;
-  min-height: 460px;
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-  overflow: hidden;
-  border: 1px solid rgba($color-text, 0.09);
-  border-radius: 40px;
-  background:
-    linear-gradient(145deg, rgba($color-gold, 0.22), transparent 34%),
-    radial-gradient(circle at 80% 20%, rgba($color-blue, 0.2), transparent 24%),
-    linear-gradient(150deg, #20100f, #0d1728 55%, #07111f);
-  box-shadow: 0 42px 100px rgba(0, 0, 0, 0.36);
+  transition: transform $transition-base, background $transition-base, color $transition-base;
 
   &:hover,
   &:focus-visible {
-    transform: translateY(-6px);
-    border-color: rgba($color-gold, 0.42);
-    box-shadow: 0 50px 115px rgba(0, 0, 0, 0.42);
+    transform: scale(1.05);
+    color: $color-bg;
+    background: $color-gold;
   }
 
   &:focus-visible {
-    outline: 3px solid rgba($color-gold, 0.55);
-    outline-offset: 5px;
-  }
-
-  &::after {
-    position: absolute;
-    right: -60px;
-    bottom: -60px;
-    width: 260px;
-    height: 260px;
-    content: "";
-    border: 1px solid rgba($color-gold, 0.26);
-    border-radius: 50%;
-  }
-
-  h2 {
-    max-width: 380px;
-    margin: $space-3 0 $space-2;
-    color: $color-text;
-    font-size: clamp(2.2rem, 5vw, 4.4rem);
-    font-weight: 950;
-    letter-spacing: -0.06em;
-    line-height: 0.96;
-  }
-
-  p {
-    max-width: 320px;
-    color: rgba($color-text, 0.68);
-    line-height: 1.65;
-  }
-  
-  h2,
-  p,
-  .posterTopline
-  {
-    position: relative;
-    z-index: 1;
+    outline: 3px solid rgba($color-gold, 0.58);
+    outline-offset: 6px;
   }
 }
-.hasPoster {
+
+.posterRail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(96px, 1fr));
+  gap: $space-2;
+  align-self: end;
+}
+
+.posterCard {
+  min-width: 0;
+  color: $color-text;
+  text-decoration: none;
+
+  &:hover .posterImage,
+  &:focus-visible .posterImage {
+    transform: translateY(-8px) rotate(-1deg);
+    border-color: rgba($color-gold, 0.55);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($color-gold, 0.5);
+    outline-offset: 6px;
+    border-radius: 24px;
+  }
+}
+
+.posterImage {
+  display: grid;
+  min-height: clamp(170px, 21vw, 260px);
+  padding: $space-2;
+  place-items: end start;
+  overflow: hidden;
+  border: 1px solid rgba($color-text, 0.12);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba($color-gold, 0.22), transparent 40%),
+    linear-gradient(150deg, #2a1711, #0d1728 65%);
+  box-shadow: 0 26px 70px rgba(#000, 0.32);
+  transition: transform $transition-base, border-color $transition-base;
+
+  strong {
+    max-width: 120px;
+    color: $color-text;
+    font-size: 1rem;
+    font-weight: 950;
+    line-height: 1.08;
+  }
+}
+
+.withPoster {
   background-position: center;
   background-size: cover;
 }
 
-.posterBackdrop {
-  z-index: 0;
-  object-fit: cover;
+.posterTitle {
+  display: block;
+  margin-top: 0.75rem;
+  color: rgba($color-text, 0.78);
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.25;
 }
 
-.posterOverlay {
+.heroFooter {
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(180deg, rgba(#07111f, 0.15), rgba(#07111f, 0.92) 85%),
-    linear-gradient(90deg, rgba(#07111f, 0.75), transparent 60%);
+  right: 0;
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  left: auto;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text;
+  font-weight: 950;
 }
 
-
-.posterTopline {
-  display: inline-flex;
-  padding: 8px 12px;
-  border: 1px solid rgba($color-text, 0.12);
+.footerLine {
+  display: block;
+  width: 120px;
+  height: 3px;
   border-radius: $radius-pill;
-  color: $color-gold;
-  background: rgba($color-bg, 0.38);
-  font-weight: 900;
+  background: linear-gradient(90deg, $color-gold, rgba($color-text, 0.18));
 }
 
-.playButton {
-  position: absolute;
-  right: 32px;
-  bottom: 32px;
-  display: grid;
-  width: 64px;
-  height: 64px;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  color: $color-bg;
-  background: $color-gold;
-  box-shadow: 0 18px 36px rgba($color-gold, 0.25);
-}
-
-.seatMiniMap {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 8px;
-  padding: $space-3;
-  border: 1px solid rgba($color-text, 0.08);
-  border-radius: 26px;
-  background: rgba($color-panel, 0.62);
-
-  span {
-    height: 22px;
-    border-radius: 8px 8px 14px 14px;
-    background: rgba($color-text, 0.18);
+@media (max-width: 1180px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
-}
 
-.booked {
-  background: $color-gold !important;
+  .posterRail {
+    grid-column: 1 / -1;
+    max-width: 720px;
+  }
 }
 
 @media (max-width: $breakpoint-lg) {
-  .hero {
-    grid-template-columns: 1fr;
+  .hero,
+  .inner {
     min-height: auto;
   }
-  
-  
+
+  .inner {
+    grid-template-columns: 1fr;
+    padding-top: clamp(3rem, 10vw, 5rem);
+  }
+
+  .playButton {
+    justify-self: start;
+  }
+
+  .heroFooter {
+    position: static;
+    grid-column: 1 / -1;
+    margin-top: $space-2;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .posterRail {
+    grid-template-columns: 1fr;
+  }
+
+  .posterImage {
+    min-height: 180px;
+  }
 }
