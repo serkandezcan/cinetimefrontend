@@ -59,20 +59,19 @@ function getRailMovies(movies, activeIndex) {
 
 export default function HeroCarousel({ movies = [] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const canSlide = movies.length > 1;
   const featuredMovie = movies[activeIndex] || movies[0];
   const railMovies = useMemo(() => getRailMovies(movies, activeIndex), [activeIndex, movies]);
 
   useEffect(() => {
-    if (!canSlide || isPaused) return undefined;
+    if (!canSlide) return undefined;
 
     const intervalId = window.setInterval(() => {
       setActiveIndex((currentIndex) => (currentIndex + 1) % movies.length);
     }, HERO_INTERVAL_MS);
 
     return () => window.clearInterval(intervalId);
-  }, [canSlide, isPaused, movies.length]);
+  }, [canSlide, movies.length]);
 
   if (!featuredMovie) return null;
 
@@ -82,10 +81,6 @@ export default function HeroCarousel({ movies = [] }) {
     <section
       className={`${styles.hero} ${heroStyle ? styles.hasBackdrop : ""}`}
       style={heroStyle}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onFocus={() => setIsPaused(true)}
-      onBlur={() => setIsPaused(false)}
     >
       <div className={styles.inner}>
         <div key={`content-${activeIndex}`} className={styles.content}>
@@ -157,3 +152,4 @@ export default function HeroCarousel({ movies = [] }) {
     </section>
   );
 }
+
