@@ -10,6 +10,7 @@
     linear-gradient(135deg, #07111f 0%, #0b1625 48%, #26111d 100%);
   background-position: center;
   background-size: cover;
+  transition: background-image 420ms ease;
 
   &::before {
     position: absolute;
@@ -51,6 +52,7 @@
 
 .content {
   max-width: 760px;
+  animation: heroContentSlideIn 540ms ease both;
 
   h1 {
     max-width: 880px;
@@ -127,6 +129,7 @@
   background: rgba(#000, 0.54);
   box-shadow: 0 26px 70px rgba(#000, 0.38);
   text-decoration: none;
+  animation: heroContentSlideIn 540ms ease both;
   transition: transform $transition-base, background $transition-base, color $transition-base;
 
   &:hover,
@@ -147,12 +150,18 @@
   grid-template-columns: repeat(3, minmax(96px, 1fr));
   gap: $space-2;
   align-self: end;
+  animation: heroRailSlideIn 540ms ease both;
 }
 
 .posterCard {
   min-width: 0;
+  padding: 0;
+  border: 0;
   color: $color-text;
+  background: transparent;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover .posterImage,
   &:focus-visible .posterImage {
@@ -224,6 +233,30 @@
   background: linear-gradient(90deg, $color-gold, rgba($color-text, 0.18));
 }
 
+@keyframes heroContentSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-34px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes heroRailSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(34px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @media (max-width: 1180px) {
   .inner {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -264,5 +297,19 @@
 
   .posterImage {
     min-height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content,
+  .playButton,
+  .posterRail {
+    animation: none;
+  }
+
+  .hero,
+  .playButton,
+  .posterImage {
+    transition: none;
   }
 }
