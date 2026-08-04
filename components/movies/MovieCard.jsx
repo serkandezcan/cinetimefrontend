@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, Clock3, Star } from "lucide-react";
+import TrailerButton from "@/components/movies/TrailerButton/TrailerButton";
 import { getMovieStatusLabel } from "@/services/movie-service";
 import styles from "./movie-card.module.scss";
-import TrailerButton from "@/components/movies/TrailerButton/TrailerButton";
-
 
 function getPosterStyle(posterUrl) {
   if (!posterUrl || !String(posterUrl).startsWith("http")) return undefined;
@@ -15,19 +14,26 @@ function getPosterStyle(posterUrl) {
 
 export default function MovieCard({ movie }) {
   const statusLabel = getMovieStatusLabel(movie.status);
-  const releaseYear = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : null;
-  const castPreview = Array.isArray(movie.cast) ? movie.cast.slice(0, 2).join(", ") : "";
+  const releaseYear = movie.releaseDate
+    ? new Date(movie.releaseDate).getFullYear()
+    : null;
+  const castPreview = Array.isArray(movie.cast)
+    ? movie.cast.slice(0, 2).join(", ")
+    : "";
   const posterStyle = getPosterStyle(movie.posterUrl);
+  const movieHref = movie.href || `/movies/${movie.id}`;
 
   return (
     <article className={styles.card}>
       <Link
-        href={`/movies/${movie.id}`}
+        href={movieHref}
         className={styles.posterLink}
         aria-label={`${movie.title} detayina git`}
       >
         <div
-          className={`${styles.posterWrapper} ${posterStyle ? styles.hasPoster : ""}`}
+          className={`${styles.posterWrapper} ${
+            posterStyle ? styles.hasPoster : ""
+          }`}
           style={posterStyle}
         >
           <div className={styles.posterFallback}>
@@ -39,7 +45,7 @@ export default function MovieCard({ movie }) {
       </Link>
 
       <div className={styles.body}>
-        <Link href={`/movies/${movie.id}`} className={styles.titleLink}>
+        <Link href={movieHref} className={styles.titleLink}>
           <h2 className={styles.title}>{movie.title}</h2>
         </Link>
 
@@ -60,7 +66,8 @@ export default function MovieCard({ movie }) {
           ) : null}
           {movie.rating != null ? (
             <span className={styles.rating}>
-              <Star size={15} fill="currentColor" /> {Number(movie.rating).toFixed(1)}
+              <Star size={15} fill="currentColor" />
+              {Number(movie.rating).toFixed(1)}
             </span>
           ) : null}
         </div>
@@ -68,7 +75,10 @@ export default function MovieCard({ movie }) {
         {castPreview && <p className={styles.cast}>Oyuncular: {castPreview}</p>}
 
         <div className={styles.trailerRow}>
-          <TrailerButton movieTitle={movie.title} trailerUrl={movie.trailerUrl} />
+          <TrailerButton
+            movieTitle={movie.title}
+            trailerUrl={movie.trailerUrl}
+          />
         </div>
       </div>
     </article>

@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { getMovies, MOVIE_STATUS, normalizeMovieStatus } from "@/services/movie-service";
+import { mergeMoviesWithFallbacks } from "@/helpers/fallback-movies";
+import {
+  getMovies,
+  MOVIE_STATUS,
+  normalizeMovieStatus,
+} from "@/services/movie-service";
 import MovieCard from "./MovieCard";
 import styles from "./movie-list.module.scss";
 
@@ -29,8 +34,12 @@ export default function MovieList() {
     setErrorMessage("");
 
     try {
-      const page = await getMovies({ size: 24, sortBy: "createdAt", order: "DESC" });
-      setMovies(page.content);
+      const page = await getMovies({
+        size: 24,
+        sortBy: "createdAt",
+        order: "DESC",
+      });
+      setMovies(mergeMoviesWithFallbacks(page.content));
     } catch (error) {
       setErrorMessage(error.message || "Filmler yuklenirken bir hata olustu.");
     } finally {
@@ -43,10 +52,16 @@ export default function MovieList() {
 
     async function loadInitialMovies() {
       try {
-        const page = await getMovies({ size: 24, sortBy: "createdAt", order: "DESC" });
-        if (isMounted) setMovies(page.content);
+        const page = await getMovies({
+          size: 24,
+          sortBy: "createdAt",
+          order: "DESC",
+        });
+        if (isMounted) setMovies(mergeMoviesWithFallbacks(page.content));
       } catch (error) {
-        if (isMounted) setErrorMessage(error.message || "Filmler yuklenirken bir hata olustu.");
+        if (isMounted) {
+          setErrorMessage(error.message || "Filmler yuklenirken bir hata olustu.");
+        }
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -65,7 +80,9 @@ export default function MovieList() {
     return movies.filter((movie) => {
       const statusMatch = matchesStatus(movie.status, activeFilter);
       const textMatch = normalizedQuery
-        ? `${movie.title} ${movie.genre} ${movie.director}`.toLowerCase().includes(normalizedQuery)
+        ? `${movie.title} ${movie.genre} ${movie.director}`
+            .toLowerCase()
+            .includes(normalizedQuery)
         : true;
 
       return statusMatch && textMatch;
@@ -95,7 +112,11 @@ export default function MovieList() {
             <button
               key={filter.label}
               type="button"
-              className={String(activeFilter) === String(filter.value) ? styles.activeFilter : ""}
+              className={
+                String(activeFilter) === String(filter.value)
+                  ? styles.activeFilter
+                  : ""
+              }
               onClick={() => setActiveFilter(filter.value)}
             >
               {filter.label}
@@ -110,7 +131,9 @@ export default function MovieList() {
         <div className={styles.stateBox} role="alert">
           <strong>Film listesi alinamadi.</strong>
           <span>{errorMessage}</span>
-          <button type="button" onClick={handleRetry}>Tekrar dene</button>
+          <button type="button" onClick={handleRetry}>
+            Tekrar dene
+          </button>
         </div>
       )}
 
