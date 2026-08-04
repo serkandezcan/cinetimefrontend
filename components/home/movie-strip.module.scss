@@ -28,10 +28,16 @@
   text-decoration: none;
 }
 
+.carousel {
+  position: relative;
+  overflow: hidden;
+}
+
 .movieGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: $space-3;
+  animation: movieCardsSlideIn 520ms ease both;
 }
 
 .movieCard {
@@ -69,12 +75,13 @@
     color: rgba($color-text, 0.62);
   }
 }
+
 .cardFooter {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: $space-2;
-  margin-top: auto; // kart ne kadar uzasa da footer'i en alta yapistirir
+  margin-top: auto;
   padding-top: $space-3;
 }
 
@@ -107,10 +114,6 @@
   background-size: cover;
 }
 
-.posterImg {
-  object-fit: cover;
-}
-
 .rating {
   position: relative;
   z-index: 1;
@@ -119,6 +122,41 @@
   gap: 5px;
   color: $color-gold;
   font-weight: 900;
+}
+
+.carouselDots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: $space-3;
+
+  button {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba($color-text, 0.22);
+    cursor: pointer;
+    transition: width $transition-base, background $transition-base;
+  }
+
+  .activeDot {
+    width: 30px;
+    background: $color-gold;
+  }
+}
+
+@keyframes movieCardsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(42px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (max-width: $breakpoint-lg) {
@@ -138,8 +176,13 @@
   }
 }
 
-.trailerButtonContainer {
-  
-  
-  
+@media (prefers-reduced-motion: reduce) {
+  .movieGrid {
+    animation: none;
+  }
+
+  .carouselDots button,
+  .movieCard {
+    transition: none;
+  }
 }
