@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Mail, Phone, Send } from "lucide-react";
 import { FOOTER_LINK_GROUPS, FOOTER_SOCIAL_LINKS } from "@/helpers/footer-links";
 import { FOOTER_MESSAGES } from "@/helpers/messages/footer-messages";
 import styles from "./footer.module.scss";
@@ -79,11 +78,6 @@ const SOCIAL_ICONS = {
   youtube: YouTubeIcon,
 };
 
-const SUPPORT_CONTACT = {
-  email: "destek@cinetime.com",
-  phone: "+90 (212) 555 48 01",
-  phoneHref: "tel:+902125554801",
-};
 
 function normalizeRole(role) {
   return String(role ?? "").replace(/^ROLE_/, "").toUpperCase();
@@ -155,50 +149,6 @@ export default function Footer() {
             </div>
           ))}
         </div>
-
-        <aside className={styles.supportCard} aria-labelledby="footer-support-title">
-          <span className="ct-eyebrow">Destek</span>
-          <h2 id="footer-support-title">Bize ulas</h2>
-          <p>
-            Bilet, seans veya uyelik islemlerinde takildigin yerde ekibe hizlica
-            ulas.
-          </p>
-
-          <div className={styles.contactList}>
-            <a href={`mailto:${SUPPORT_CONTACT.email}`}>
-              <Mail size={17} />
-              {SUPPORT_CONTACT.email}
-            </a>
-            <a href={SUPPORT_CONTACT.phoneHref}>
-              <Phone size={17} />
-              {SUPPORT_CONTACT.phone}
-            </a>
-          </div>
-
-          <form
-            className={styles.contactForm}
-            action={`mailto:${SUPPORT_CONTACT.email}`}
-            method="post"
-            encType="text/plain"
-          >
-            <label>
-              <span>Ad Soyad</span>
-              <input name="name" type="text" placeholder="Adinizi yazin" />
-            </label>
-            <label>
-              <span>E-posta</span>
-              <input name="email" type="email" placeholder="ornek@mail.com" />
-            </label>
-            <label>
-              <span>Mesaj</span>
-              <textarea name="message" rows="3" placeholder="Sorununu kisaca yaz" />
-            </label>
-            <button type="submit">
-              <Send size={16} />
-              Gonder
-            </button>
-          </form>
-        </aside>
       </div>
 
       <div className={styles.bottomBar}>
