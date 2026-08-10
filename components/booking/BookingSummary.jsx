@@ -3,6 +3,19 @@ import { RefreshCw, Ticket } from "lucide-react";
 import { getSeatId, getSeatLabel } from "@/helpers/seat-helpers";
 import styles from "./seat-selection.module.scss";
 
+const RESERVATION_STATUS_LABELS = {
+  PENDING: "Odeme bekliyor",
+  CONFIRMED: "Onaylandi",
+  CANCELLED: "Iptal edildi",
+};
+
+function getReservationStatusLabel(status) {
+  return (
+    RESERVATION_STATUS_LABELS[String(status || "PENDING").toUpperCase()] ||
+    "Odeme bekliyor"
+  );
+}
+
 export default function BookingSummary({
   showtime,
   selectedSeats = [],
@@ -20,7 +33,7 @@ export default function BookingSummary({
 }) {
   return (
     <aside className={styles.summaryPanel}>
-      <span className="ct-eyebrow">Booking Summary</span>
+      <span className="ct-eyebrow">Rezervasyon ozeti</span>
       <h2>Secim ozeti</h2>
 
       <div className={styles.summaryFacts}>
@@ -60,7 +73,7 @@ export default function BookingSummary({
 
       {!isAuthenticated && (
         <Link href="/login" className="ct-button ct-button-ghost">
-          Booking icin giris yap
+          Rezervasyon icin giris yap
         </Link>
       )}
 
@@ -71,14 +84,14 @@ export default function BookingSummary({
           onClick={onCreateBooking}
           disabled={isSubmitting || selectedSeats.length === 0 || !isBookable}
         >
-          <Ticket size={17} /> {isSubmitting ? "Booking olusturuluyor..." : "Booking olustur"}
+          <Ticket size={17} /> {isSubmitting ? "Yer ayriliyor..." : "Yerimi ayir"}
         </button>
       )}
 
       {booking && (
         <div className={styles.bookingResult}>
-          <strong>Booking #{booking.id}</strong>
-          <span>{booking.status || "PENDING"}</span>
+          <strong>Rezervasyon #{booking.id}</strong>
+          <span>{getReservationStatusLabel(booking.status)}</span>
         </div>
       )}
 

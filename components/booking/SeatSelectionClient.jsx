@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -13,11 +13,11 @@ import BookingSummary from "./BookingSummary";
 import SeatLegend from "./SeatLegend";
 import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
-import PaymentForm from "@/components/payment/PaymentForm"
-import PaymentResult from "@/components/payment/PaymentResult"
+import PaymentForm from "@/components/payment/PaymentForm";
+import PaymentResult from "@/components/payment/PaymentResult";
 
 const BOOKING_EXIT_CONFIRM_MESSAGE =
-  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki booking akisi sifirlanacak.";
+  "Rezervasyon adimindan cikmak istiyor musun? Secili koltuklar ve odeme akisi sifirlanacak.";
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -51,6 +51,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const paymentSectionRef = useRef(null);
 
   async function loadSeatData({ silent = false } = {}) {
     if (!silent) setIsLoading(true);
@@ -115,7 +116,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   const normalizedRole = normalizeSessionRole(session?.user?.role);
   const isCustomer = normalizedRole === "CUSTOMER";
   const bookingAccessMessage = status === "authenticated" && !isCustomer
-    ? "Booking olusturmak icin customer hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
+    ? "Rezervasyon olusturmak icin musteri hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
     : "";
   const bookingBlockedMessage = bookingUnavailableMessage || bookingAccessMessage;
   const isBookable = !bookingBlockedMessage;
@@ -125,14 +126,22 @@ export default function SeatSelectionClient({ showtimeId }) {
     (Boolean(booking) && !payment) ||
     isSubmitting ||
     isPaying;
- // const hasBookingProgress = selectedSeatIds.length > 0 || Boolean(booking) || isSubmitting;
+
+
+  useEffect(() => {
+    if (!booking || payment) return;
+    paymentSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [booking, payment]);
 
   const resetBookingFlow = useCallback(() => {
     setSelectedSeatIds([]);
     setBooking(null);
-     setPayment(null);
-     setPaymentError("");
-     setIsPaying(false);
+    setPayment(null);
+    setPaymentError("");
+    setIsPaying(false);
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -200,7 +209,7 @@ export default function SeatSelectionClient({ showtimeId }) {
 
   async function handleCreateBooking() {
     if (!session?.accessToken) {
-      setErrorMessage("Booking olusturmak icin customer olarak giris yapmalisin.");
+      setErrorMessage("Rezervasyon olusturmak icin musteri olarak giris yapmalisin.");
       return;
     }
 
@@ -229,7 +238,9 @@ export default function SeatSelectionClient({ showtimeId }) {
       setPayment(null);
       setPaymentError("");
       setBooking(createdBooking);
-      setSuccessMessage(`Booking #${createdBooking?.id || ""} olusturuldu.`);
+      setSuccessMessage(
+        `Yeriniz ayrildi. Rezervasyon #${createdBooking?.id || ""} olusturuldu. Simdi odeme yapabilirsiniz.`
+      );
       await loadSeatData({ silent: true });
     } catch (error) {
       setErrorMessage(translateBookingError(error.message));
@@ -237,35 +248,35 @@ export default function SeatSelectionClient({ showtimeId }) {
       setIsSubmitting(false);
     }
   }
-async function handlePayment(payload) {
-  if (!booking?.id) {
-    setPaymentError("Odeme icin gecerli bir booking bulunamadi.");
-    return;
+  async function handlePayment(payload) {
+    if (!booking?.id) {
+      setPaymentError("Odeme icin gecerli bir rezervasyon bulunamadi.");
+      return;
+    }
+
+    if (!session?.accessToken) {
+      setPaymentError("Odeme yapmak icin yeniden giris yapmalisin.");
+      return;
+    }
+
+    setIsPaying(true);
+    setPaymentError("");
+
+    try {
+      const paymentResult = await completePayment(
+        booking.id,
+        payload,
+        session.accessToken,
+      );
+
+      setPayment(paymentResult);
+      setSuccessMessage("Odeme basariyla tamamlandi.");
+    } catch (error) {
+      setPaymentError(error.message || "Odeme tamamlanamadi.");
+    } finally {
+      setIsPaying(false);
+    }
   }
-
-  if (!session?.accessToken) {
-    setPaymentError("Odeme yapmak icin yeniden giris yapmalisin.");
-    return;
-  }
-
-  setIsPaying(true);
-  setPaymentError("");
-
-  try {
-    const paymentResult = await completePayment(
-      booking.id,
-      payload,
-      session.accessToken,
-    );
-
-    setPayment(paymentResult);
-    setSuccessMessage("Odeme basariyla tamamlandi.");
-  } catch (error) {
-    setPaymentError(error.message || "Odeme tamamlanamadi.");
-  } finally {
-    setIsPaying(false);
-  }
-}
   return (
     <section className={styles.page}>
       <Link href="/showtimes" className={styles.backLink}>
@@ -273,7 +284,7 @@ async function handlePayment(payload) {
       </Link>
 
       <div className={styles.header}>
-        <span className="ct-eyebrow">Seat Selection</span>
+        <span className="ct-eyebrow">Koltuk secimi</span>
         <h1>Koltuk secimi</h1>
         <p>
           {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
@@ -327,11 +338,15 @@ async function handlePayment(payload) {
         </div>
       )}
       {booking && !payment && (
-        <>
+        <section
+          ref={paymentSectionRef}
+          className={styles.paymentStep}
+          aria-live="polite"
+        >
           <div className={styles.successPanel}>
             <CheckCircle2 size={22} />
-            Booking #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
-            tamamlayabilirsin.
+            Yeriniz ayrildi. Rezervasyon #{booking.id} olusturuldu. Simdi odeme
+            yapabilirsiniz.
           </div>
 
           <PaymentForm
@@ -339,7 +354,7 @@ async function handlePayment(payload) {
             errorMessage={paymentError}
             onSubmit={handlePayment}
           />
-        </>
+        </section>
       )}
 
       {payment && <PaymentResult payment={payment} bookingId={booking.id} />}

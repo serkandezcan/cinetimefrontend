@@ -27,14 +27,14 @@ export function isShowtimeBookable(showtime, now = new Date()) {
 }
 
 export function getShowtimeUnavailableMessage(showtime) {
-  if (!showtime) return "Seans bilgisi alinamadigi icin booking olusturulamiyor.";
+  if (!showtime) return "Seans bilgisi alinamadigi icin rezervasyon olusturulamiyor.";
 
   if (!isShowtimeActive(showtime)) {
     return "Bu seans aktif degil. Lutfen farkli bir seans sec.";
   }
 
   if (hasShowtimeStarted(showtime)) {
-    return "Bu seans basladigi veya gecmiste kaldigi icin booking olusturulamaz.";
+    return "Bu seans basladigi veya gecmiste kaldigi icin rezervasyon olusturulamaz.";
   }
 
   return "";
@@ -48,7 +48,7 @@ export function translateBookingError(message) {
   const normalizedMessage = String(message ?? "").toLowerCase();
 
   if (normalizedMessage.includes("already started")) {
-    return "Bu seans basladigi veya gecmiste kaldigi icin booking olusturulamaz.";
+    return "Bu seans basladigi veya gecmiste kaldigi icin rezervasyon olusturulamaz.";
   }
 
   if (normalizedMessage.includes("already booked")) {
@@ -56,8 +56,8 @@ export function translateBookingError(message) {
   }
 
   if (normalizedMessage.includes("status code 403") || normalizedMessage.includes("access denied")) {
-    return "Bu islem icin customer hesabi ile giris yapmalisin. Admin hesabi booking olusturamaz.";
+    return "Bu islem icin musteri hesabi ile giris yapmalisin. Admin hesabi rezervasyon olusturamaz.";
   }
 
-  return message || "Booking olusturulamadi.";
+  return message || "Rezervasyon olusturulamadi.";
 }

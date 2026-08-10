@@ -5,7 +5,7 @@ import { getCustomerTickets } from "@/services/ticket-service";
 import styles from "./tickets.module.scss";
 
 export const metadata = {
-  title: "My Tickets",
+  title: "Biletlerim",
 };
 
 export default async function TicketsPage() {
@@ -21,16 +21,16 @@ export default async function TicketsPage() {
   try {
     tickets = await getCustomerTickets(session.accessToken);
   } catch (error) {
-    console.error("[tickets-page] Tickets could not be fetched:", error);
-    errorMessage = error.message || "Tickets could not be loaded.";
+    console.error("[tickets-page] Biletler alinamadi:", error);
+    errorMessage = error.message || "Biletler yuklenemedi.";
   }
 
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <span className="ct-eyebrow">Ticket Wallet</span>
-        <h1>My Tickets</h1>
-        <p>View your active, used and cancelled cinema tickets.</p>
+        <span className="ct-eyebrow">Bilet cuzdanim</span>
+        <h1>Biletlerim</h1>
+        <p>Aktif, kullanilmis ve iptal edilmis sinema biletlerini goruntule.</p>
       </header>
 
       {errorMessage ? (
