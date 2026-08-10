@@ -38,8 +38,7 @@ export default function DashboardPage() {
         <span className="ct-eyebrow">Admin Dashboard</span>
         <h1>Yonetim paneli</h1>
         <p>
-          Takim domain ekranlarini buradan test edebilir. Film ekleme formu Cahit icin
-          Movie Domain teslimati olarak Film yonetimi kartindadir.
+          Film, sinema, salon ve seans yonetim islemlerini bu panelden takip edebilirsin.
         </p>
       </div>
 

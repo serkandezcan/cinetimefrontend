@@ -21,7 +21,7 @@ export default function Page() {
         </article>
         <article className={styles.card}>
           <h2>Urun</h2>
-          <p>Film, sinema, seans, koltuk, booking, odeme ve bilet akisini tek arayuzde toplar.</p>
+          <p>Film, sinema, seans, koltuk, rezervasyon, odeme ve bilet akisini tek arayuzde toplar.</p>
         </article>
         <article className={styles.card}>
           <h2>Takim</h2>

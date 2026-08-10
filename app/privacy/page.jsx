@@ -9,7 +9,7 @@ export default function Page() {
         <span className="ct-eyebrow">Gizlilik</span>
         <h1>Veri gizliligi sade ve seffaf olmali.</h1>
         <p>
-          Bu demo uygulamada kullanici hesabi, booking ve bilet bilgileri yalnizca
+          Bu demo uygulamada kullanici hesabi, rezervasyon ve bilet bilgileri yalnizca
           CineTime deneyimini calistirmak icin kullanilir.
         </p>
       </section>
@@ -21,7 +21,7 @@ export default function Page() {
         </article>
         <article className={styles.card}>
           <h2>Bilet bilgileri</h2>
-          <p>Booking, koltuk ve ticket bilgileri kullanicinin biletlerini gostermek icin kullanilir.</p>
+          <p>Rezervasyon, koltuk ve bilet bilgileri kullanicinin biletlerini gostermek icin kullanilir.</p>
         </article>
         <article className={styles.card}>
           <h2>Guvenlik</h2>

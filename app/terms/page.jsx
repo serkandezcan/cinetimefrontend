@@ -17,7 +17,7 @@ export default function Page() {
       <section className={styles.grid}>
         <article className={styles.card}>
           <h2>Rezervasyon</h2>
-          <p>Secilen koltuklar booking olusturulduktan sonra ayni seans icin tekrar satilamaz.</p>
+          <p>Secilen koltuklar rezervasyon olusturulduktan sonra ayni seans icin tekrar satilamaz.</p>
         </article>
         <article className={styles.card}>
           <h2>Odeme</h2>

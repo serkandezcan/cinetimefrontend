@@ -2,11 +2,11 @@ import { CalendarDays, Clock3, MapPin, Ticket, XCircle } from "lucide-react";
 import styles from "./ticket-card.module.scss";
 
 const STATUS_LABELS = {
-  ACTIVE: "Active",
-  CONFIRMED: "Active",
-  USED: "Used",
-  CANCELLED: "Cancelled",
-  UNKNOWN: "Active",
+  ACTIVE: "Aktif",
+  CONFIRMED: "Aktif",
+  USED: "Kullanildi",
+  CANCELLED: "Iptal edildi",
+  UNKNOWN: "Aktif",
 };
 
 const STATUS_CLASSES = {
@@ -19,10 +19,10 @@ const STATUS_CLASSES = {
 
 function formatDate(date) {
   if (!date) {
-    return "Unavailable";
+    return "Tarih yok";
   }
 
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("tr-TR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -30,7 +30,12 @@ function formatDate(date) {
 }
 
 function formatTime(time) {
-  return time ? time.slice(0, 5) : "Unavailable";
+  return time ? time.slice(0, 5) : "Saat yok";
+}
+
+function formatSeatType(seatType) {
+  if (!seatType) return "Bilgi yok";
+  return String(seatType).replaceAll("_", " ");
 }
 
 function getTicketStatus(ticket) {
@@ -50,52 +55,52 @@ export default function TicketCard({ ticket, isCanceling = false, onCancel }) {
   const seat =
     ticket.rowLetter && ticket.seatNumber !== undefined
       ? `${ticket.rowLetter}${ticket.seatNumber}`
-      : "Unavailable";
+      : "Koltuk yok";
   const isCancelable = canCancelTicket(ticket, status);
 
   return (
     <article className={styles.card}>
       <div className={styles.cardHeader}>
         <div>
-          <span className={styles.eyebrow}>Cinema Ticket</span>
-          <h3>{ticket.movieTitle ?? "Cinema Ticket"}</h3>
-          <p>Ticket No: {ticket.ticketNumber ?? "Unavailable"}</p>
+          <span className={styles.eyebrow}>Sinema bileti</span>
+          <h3>{ticket.movieTitle ?? "Sinema bileti"}</h3>
+          <p>Bilet No: {ticket.ticketNumber ?? "Bilgi yok"}</p>
         </div>
 
         <span className={`${styles.status} ${STATUS_CLASSES[status] ?? styles.statusUnknown}`}>
-          {STATUS_LABELS[status] ?? "Unknown"}
+          {STATUS_LABELS[status] ?? "Aktif"}
         </span>
       </div>
 
       <dl className={styles.details}>
         <div>
-          <dt><MapPin size={15} /> Cinema</dt>
-          <dd>{ticket.cinemaName ?? "Unavailable"}</dd>
+          <dt><MapPin size={15} /> Sinema</dt>
+          <dd>{ticket.cinemaName ?? "Bilgi yok"}</dd>
         </div>
 
         <div>
-          <dt>Hall</dt>
-          <dd>{ticket.hallName ?? "Unavailable"}</dd>
+          <dt>Salon</dt>
+          <dd>{ticket.hallName ?? "Bilgi yok"}</dd>
         </div>
 
         <div>
-          <dt><CalendarDays size={15} /> Date</dt>
+          <dt><CalendarDays size={15} /> Tarih</dt>
           <dd>{formatDate(ticket.showtimeDate)}</dd>
         </div>
 
         <div>
-          <dt><Clock3 size={15} /> Time</dt>
+          <dt><Clock3 size={15} /> Saat</dt>
           <dd>{formatTime(ticket.startTime)}</dd>
         </div>
 
         <div>
-          <dt><Ticket size={15} /> Seat</dt>
+          <dt><Ticket size={15} /> Koltuk</dt>
           <dd>{seat}</dd>
         </div>
 
         <div>
-          <dt>Seat Type</dt>
-          <dd>{ticket.seatType?.replaceAll("_", " ") ?? "Unavailable"}</dd>
+          <dt>Koltuk tipi</dt>
+          <dd>{formatSeatType(ticket.seatType)}</dd>
         </div>
       </dl>
 
@@ -107,7 +112,7 @@ export default function TicketCard({ ticket, isCanceling = false, onCancel }) {
           disabled={isCanceling}
         >
           <XCircle size={17} />
-          {isCanceling ? "Cancelling..." : "Cancel ticket"}
+          {isCanceling ? "Iptal ediliyor..." : "Bileti iptal et"}
         </button>
       )}
     </article>
