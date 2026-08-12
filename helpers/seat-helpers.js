@@ -30,5 +30,11 @@ export function isSeatBooked(seat) {
 
 export function isSeatAvailable(seat) {
   if (getSeatType(seat) === "DISABLED") return false;
-  return !isSeatBooked(seat);
+  return !isSeatBooked(seat) && !isSeatLocked(seat);
+}
+
+export function isSeatLocked(seat) {
+  if (typeof seat?.isLocked === "boolean") return seat.isLocked;
+  if (typeof seat?.locked === "boolean") return seat.locked;
+  return false;
 }

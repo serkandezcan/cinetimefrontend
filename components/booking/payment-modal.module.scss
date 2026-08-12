@@ -1,0 +1,43 @@
+@use "@/styles/variables" as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: grid;
+  place-items: center;
+  padding: $space-3;
+  background: $overlay-strong;
+}
+
+.modal {
+  position: relative;
+  width: min(100%, 480px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba($color-text, 0.08);
+  border-radius: $radius-xl;
+  background: $color-panel;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+}
+
+.closeButton {
+  position: absolute;
+  top: $space-3;
+  right: $space-3;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba($color-text, 0.1);
+  border-radius: 50%;
+  color: $color-text;
+  background: rgba($color-text, 0.06);
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba($color-text, 0.14);
+  }
+}

@@ -94,6 +94,12 @@ export const API_ROUTES = {
   tickets: {
     detailByNumber: (ticketNumber) => `/customer/tickets/${ticketNumber}`,
   },
+
+  // YENİ EKLENEN — koltuk kilitleme (Redis, seçim aşaması)
+  seats: {
+    lock: "/customer/seats/lock",     // POST
+    unlock: "/customer/seats/unlock", // POST
+  },
 };
 
 export default API_ROUTES;
