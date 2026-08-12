@@ -56,7 +56,7 @@ export default function PaymentForm({
         <CreditCard size={24} />
 
         <div>
-          <span className="ct-eyebrow">Payment</span>
+          <span className="ct-eyebrow">Odeme</span>
           <h2>Odeme bilgileri</h2>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function PaymentForm({
             maxLength={19}
           />
 
-          <small>{cardNumber.length}/16 digits</small>
+          <small>{cardNumber.length}/16 rakam</small>
         </label>
 
         <label>
@@ -98,7 +98,7 @@ export default function PaymentForm({
           <input
             type="text"
             autoComplete="cc-name"
-            placeholder="Enter your name"
+            placeholder="Adinizi karttaki gibi yazin"
             value={cardHolderName}
             onChange={(event) => {
               setCardHolderName(event.target.value);

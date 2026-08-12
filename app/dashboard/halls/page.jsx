@@ -4,6 +4,8 @@ import HallAdminPanel from "@/components/dashboard/hall/HallAdminPanel";
 import { getCinemas } from "@/services/cinema-service";
 import { CINEMA_MESSAGES } from "@/helpers/messages/cinema-messages";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: CINEMA_MESSAGES.admin.hall.pageTitle };
 
 export default async function Page() {

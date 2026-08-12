@@ -26,12 +26,9 @@ import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentResult from "@/components/payment/PaymentResult";
-import { lockSeat, unlockSeat } from "@/services/seat-lock-service";
-import PaymentModal from "../../components/booking/PaymentModal";
-import { config } from "@/helpers/config";
 
 const BOOKING_EXIT_CONFIRM_MESSAGE =
-  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki booking akisi sifirlanacak.";
+  "Rezervasyon adimindan cikmak istiyor musun? Secili koltuklar ve odeme akisi sifirlanacak.";
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -72,10 +69,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [lockToken, setLockToken] = useState(null);
-  const [lockingSeatId, setLockingSeatId] = useState(null);
-  const [lockExpiresAt, setLockExpiresAt] = useState(null);
-  const [remainingSeconds, setRemainingSeconds] = useState(null);
+  const paymentSectionRef = useRef(null);
 
   // sessionStorage restore/write effect'leri arasındaki yarış durumunu önlemek için.
   const hasHydratedRef = useRef(false);
@@ -318,12 +312,10 @@ export default function SeatSelectionClient({ showtimeId }) {
   const bookingUnavailableMessage = getShowtimeUnavailableMessage(showtime);
   const normalizedRole = normalizeSessionRole(session?.user?.role);
   const isCustomer = normalizedRole === "CUSTOMER";
-  const bookingAccessMessage =
-    status === "authenticated" && !isCustomer
-      ? "Booking olusturmak icin customer hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
-      : "";
-  const bookingBlockedMessage =
-    bookingUnavailableMessage || bookingAccessMessage;
+  const bookingAccessMessage = status === "authenticated" && !isCustomer
+    ? "Rezervasyon olusturmak icin musteri hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
+    : "";
+  const bookingBlockedMessage = bookingUnavailableMessage || bookingAccessMessage;
   const isBookable = !bookingBlockedMessage;
 
   const hasBookingProgress =
@@ -332,10 +324,23 @@ export default function SeatSelectionClient({ showtimeId }) {
     isSubmitting ||
     isPaying;
 
-  // Seçili tüm koltukları backend'de serbest bırakır (best-effort, paralel).
-  async function unlockAllSelectedSeats() {
-    if (!lockToken || selectedSeatIds.length === 0 || !session?.accessToken)
-      return;
+
+  useEffect(() => {
+    if (!booking || payment) return;
+    paymentSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [booking, payment]);
+
+  const resetBookingFlow = useCallback(() => {
+    setSelectedSeatIds([]);
+    setBooking(null);
+    setPayment(null);
+    setPaymentError("");
+    setIsPaying(false);
+    setErrorMessage("");
+    setSuccessMessage("");
 
     await Promise.allSettled(
       selectedSeatIds.map((seatId) =>
@@ -508,9 +513,7 @@ export default function SeatSelectionClient({ showtimeId }) {
 
   async function handleCreateBooking() {
     if (!session?.accessToken) {
-      setErrorMessage(
-        "Booking olusturmak icin customer olarak giris yapmalisin.",
-      );
+      setErrorMessage("Rezervasyon olusturmak icin musteri olarak giris yapmalisin.");
       return;
     }
 
@@ -540,18 +543,19 @@ export default function SeatSelectionClient({ showtimeId }) {
       setPayment(null);
       setPaymentError("");
       setBooking(createdBooking);
-      setSuccessMessage(`Booking #${createdBooking?.id || ""} olusturuldu.`);
-      await loadSeatData({ silent: true, skipSelectionFilter: true });
+      setSuccessMessage(
+        `Yeriniz ayrildi. Rezervasyon #${createdBooking?.id || ""} olusturuldu. Simdi odeme yapabilirsiniz.`
+      );
+      await loadSeatData({ silent: true });
     } catch (error) {
       setErrorMessage(translateBookingError(error.message));
     } finally {
       setIsSubmitting(false);
     }
   }
-
   async function handlePayment(payload) {
     if (!booking?.id) {
-      setPaymentError("Odeme icin gecerli bir booking bulunamadi.");
+      setPaymentError("Odeme icin gecerli bir rezervasyon bulunamadi.");
       return;
     }
 
@@ -578,35 +582,6 @@ export default function SeatSelectionClient({ showtimeId }) {
       setIsPaying(false);
     }
   }
-
-  async function handleClosePaymentModal() {
-    if (!booking?.id) {
-      return;
-    }
-
-    try {
-      await cancelBooking(booking.id, session.accessToken);
-    } catch (error) {
-      // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
-    } finally {
-      // DİKKAT — artık resetBookingFlow() ÇAĞRILMIYOR.
-      // Redis kilidi hâlâ aktif (backend artık booking oluşunca silmiyor),
-      // bu yüzden selectedSeatIds/lockToken/lockExpiresAt'e dokunmuyoruz —
-      // kullanıcı aynı koltuklarla, kalan süreyle seçim ekranına geri dönüyor.
-      setBooking(null);
-      setPayment(null);
-      setPaymentError("");
-      setSuccessMessage("");
-      await loadSeatData({ silent: true, skipSelectionFilter: true }); // YENİ EKLENEN
-    }
-  }
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  }
-
   return (
     <section className={styles.page}>
       <Link href='/showtimes' className={styles.backLink}>
@@ -614,7 +589,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       </Link>
 
       <div className={styles.header}>
-        <span className='ct-eyebrow'>Seat Selection</span>
+        <span className="ct-eyebrow">Koltuk secimi</span>
         <h1>Koltuk secimi</h1>
         <p>
           {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
@@ -670,11 +645,15 @@ export default function SeatSelectionClient({ showtimeId }) {
       )}
 
       {booking && !payment && (
-        <PaymentModal onClose={handleClosePaymentModal}>
+        <section
+          ref={paymentSectionRef}
+          className={styles.paymentStep}
+          aria-live="polite"
+        >
           <div className={styles.successPanel}>
             <CheckCircle2 size={22} />
-            Booking #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
-            tamamlayabilirsin.
+            Yeriniz ayrildi. Rezervasyon #{booking.id} olusturuldu. Simdi odeme
+            yapabilirsiniz.
           </div>
 
           {/* YENİ EKLENEN — sayaç artık ödeme ekranında da görünüyor */}
@@ -696,7 +675,7 @@ export default function SeatSelectionClient({ showtimeId }) {
             errorMessage={paymentError}
             onSubmit={handlePayment}
           />
-        </PaymentModal>
+        </section>
       )}
 
       {payment && (

@@ -2,6 +2,17 @@ import Link from "next/link";
 import { CheckCircle2, Ticket } from "lucide-react";
 import styles from "./payment.module.scss";
 
+const PAYMENT_STATUS_LABELS = {
+  COMPLETED: "Tamamlandi",
+  PENDING: "Bekliyor",
+  FAILED: "Basarisiz",
+};
+
+const PAYMENT_METHOD_LABELS = {
+  CREDIT_CARD: "Kredi karti",
+  DEBIT_CARD: "Banka karti",
+};
+
 function formatAmount(amount) {
   const numericAmount = Number(amount);
 
@@ -9,7 +20,7 @@ function formatAmount(amount) {
     return "Tutar bilgisi yok";
   }
 
-  return new Intl.NumberFormat("en-TR", {
+  return new Intl.NumberFormat("tr-TR", {
     style: "currency",
     currency: "TRY",
   }).format(numericAmount);
@@ -26,6 +37,14 @@ function formatDate(date) {
   }).format(new Date(date));
 }
 
+function translatePaymentStatus(status) {
+  return PAYMENT_STATUS_LABELS[String(status || "COMPLETED").toUpperCase()] || "Tamamlandi";
+}
+
+function translatePaymentMethod(method) {
+  return PAYMENT_METHOD_LABELS[String(method || "").toUpperCase()] || "Bilgi bulunamadi";
+}
+
 export default function PaymentResult({ payment, bookingId }) {
   if (!payment) {
     return null;
@@ -36,15 +55,20 @@ export default function PaymentResult({ payment, bookingId }) {
       <CheckCircle2 className={styles.successIcon} size={44} />
 
       <div className={styles.resultHeading}>
-        <span className="ct-eyebrow">Payment Result</span>
+        <span className="ct-eyebrow">Odeme sonucu</span>
         <h2>Odeme basarili</h2>
-        <p>Booking #{bookingId} icin odeme tamamlandi.</p>
+        <p>Rezervasyon #{bookingId} icin odeme tamamlandi.</p>
       </div>
+
+      <p className={styles.notice}>
+        Bilet bilgileriniz hesabinizda hazir. Bildirim servisi aktif oldugunda
+        kayitli e-posta ve telefonunuza otomatik gonderilecek.
+      </p>
 
       <dl className={styles.resultDetails}>
         <div>
           <dt>Durum</dt>
-          <dd>{payment.status || "COMPLETED"}</dd>
+          <dd>{translatePaymentStatus(payment.status)}</dd>
         </div>
 
         <div>
@@ -54,9 +78,7 @@ export default function PaymentResult({ payment, bookingId }) {
 
         <div>
           <dt>Odeme yontemi</dt>
-          <dd>
-            {payment.paymentMethod?.replaceAll("_", " ") || "Bilgi bulunamadi"}
-          </dd>
+          <dd>{translatePaymentMethod(payment.paymentMethod)}</dd>
         </div>
 
         <div>
