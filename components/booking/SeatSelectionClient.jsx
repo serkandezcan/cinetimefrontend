@@ -31,7 +31,7 @@ import PaymentModal from "../../components/booking/PaymentModal";
 import { config } from "@/helpers/config";
 
 const BOOKING_EXIT_CONFIRM_MESSAGE =
-  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki booking akisi sifirlanacak.";
+  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki rezervasyon akisi sifirlanacak.";
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -56,6 +56,12 @@ function normalizeSessionRole(role) {
 
 function getSeatLockStorageKey(showtimeId) {
   return `ct-seat-lock:${showtimeId}`;
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
 export default function SeatSelectionClient({ showtimeId }) {
@@ -93,51 +99,6 @@ export default function SeatSelectionClient({ showtimeId }) {
     sessionStorage.removeItem(getSeatLockStorageKey(showtimeId));
   }, [showtimeId]);
 
-  // Kalan süreyi her saniye hesaplayan sayaç
- useEffect(() => {
-   if (!lockExpiresAt) {
-     setRemainingSeconds(null);
-     return undefined;
-   }
-
-   async function handleExpiry() {
-     // Önce backend'de booking'i iptal etmeyi BEKLE (varsa)
-     if (booking?.id && session?.accessToken) {
-       try {
-         await cancelBooking(booking.id, session.accessToken);
-       } catch (error) {
-         // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
-       }
-     }
-
-     // İptal tamamlandıktan SONRA local state'i sıfırla
-     resetBookingFlow();
-
-     // İptal backend'de kesinleştikten sonra koltuk haritasını tazele —
-     // bu sırada artık backend "dolu değil" diyecek
-     await loadSeatData({ silent: true });
-   }
-
-   function tick() {
-     const diffMs = new Date(lockExpiresAt).getTime() - Date.now();
-     const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
-     setRemainingSeconds(diffSeconds);
-
-     if (diffSeconds === 0) {
-       setErrorMessage(
-         "Koltuk secim sureniz doldu, lutfen tekrar secim yapin.",
-       );
-       handleExpiry(); // fire-and-forget — tick senkron kalmaya devam ediyor
-     }
-   }
-
-   tick();
-   const intervalId = setInterval(tick, 1000);
-
-   return () => clearInterval(intervalId);
-   // eslint-disable-next-line react-hooks/exhaustive-deps
- }, [lockExpiresAt, booking?.id, session?.accessToken]);
-
   async function loadSeatData({
     silent = false,
     skipSelectionFilter = false,
@@ -160,7 +121,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       );
 
       setSelectedSeatIds((current) => {
-        if (skipSelectionFilter) return current; // YENİ EKLENEN — parametreyle kontrol
+        if (skipSelectionFilter) return current;
 
         return current.filter((id) =>
           normalizedSeats.some(
@@ -176,6 +137,48 @@ export default function SeatSelectionClient({ showtimeId }) {
     }
   }
 
+  // Kalan süreyi her saniye hesaplayan sayaç.
+  // Süre dolduğunda: varsa booking'i backend'de İPTAL ETMEYİ BEKLİYORUZ,
+  // sonra local state'i sıfırlıyoruz, sonra koltuk haritasını tazeliyoruz.
+  useEffect(() => {
+    if (!lockExpiresAt) {
+      setRemainingSeconds(null);
+      return undefined;
+    }
+
+    async function handleExpiry() {
+      if (booking?.id && session?.accessToken) {
+        try {
+          await cancelBooking(booking.id, session.accessToken);
+        } catch (error) {
+          // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
+        }
+      }
+
+      resetBookingFlow();
+      await loadSeatData({ silent: true });
+    }
+
+    function tick() {
+      const diffMs = new Date(lockExpiresAt).getTime() - Date.now();
+      const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
+      setRemainingSeconds(diffSeconds);
+
+      if (diffSeconds === 0) {
+        setErrorMessage(
+          "Koltuk secim sureniz doldu, lutfen tekrar secim yapin.",
+        );
+        handleExpiry(); // fire-and-forget — tick senkron kalıyor, içeride await sırası garanti
+      }
+    }
+
+    tick();
+    const intervalId = setInterval(tick, 1000);
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockExpiresAt, booking?.id, session?.accessToken]);
+
   // Sayfa yenilendiğinde daha önceki koltuk kilidini geri yükler.
   // sessionStorage'daki bilgi bayat olabileceği için (TTL sunucuda çoktan dolmuş olabilir),
   // körü körüne güvenmek yerine her koltuk için tekrar lockSeat çağırarak sunucuya doğrulatıyoruz.
@@ -187,7 +190,6 @@ export default function SeatSelectionClient({ showtimeId }) {
       return undefined;
     }
 
-    // Session henüz hazır değilse (accessToken yoksa) bekle, effect session değişince tekrar çalışacak
     if (!session?.accessToken) {
       return undefined;
     }
@@ -209,8 +211,6 @@ export default function SeatSelectionClient({ showtimeId }) {
           return;
         }
 
-        // Sunucuya sorarak doğrula — her koltuk için tekrar lockSeat çağırıyoruz (aynı token'la).
-        // Biri bile başarısız olursa (409) bu kilit artık geçerli değil demektir.
         let currentToken = saved.lockToken;
         let latestExpiresAt = saved.lockExpiresAt;
 
@@ -229,7 +229,6 @@ export default function SeatSelectionClient({ showtimeId }) {
         setLockToken(currentToken);
         setLockExpiresAt(latestExpiresAt);
       } catch {
-        // Doğrulama başarısız oldu (409 dahil) — bu seçim artık geçerli değil, temizle
         sessionStorage.removeItem(getSeatLockStorageKey(showtimeId));
         if (!cancelled) {
           setErrorMessage(
@@ -265,17 +264,6 @@ export default function SeatSelectionClient({ showtimeId }) {
     );
   }, [showtimeId, selectedSeatIds, lockToken, lockExpiresAt]);
 
-  // YENİ EKLENEN — koltuk haritasını periyodik olarak sessizce tazele
-  useEffect(() => {
-    if (booking) return undefined; // booking aktifken (pop-up açıkken) gereksiz
-
-    const intervalId = setInterval(() => {
-      loadSeatData({ silent: true });
-    }, 10000); // 30 saniyede bir
-
-    return () => clearInterval(intervalId);
-  }, [booking, showtimeId]);
-
   useEffect(() => {
     let isMounted = true;
 
@@ -308,6 +296,19 @@ export default function SeatSelectionClient({ showtimeId }) {
     };
   }, [showtimeId]);
 
+  // Koltuk haritasını periyodik olarak sessizce tazele — başka kullanıcıların
+  // kilitlediği/serbest bıraktığı koltukları manuel yenileme yapmadan görebilelim.
+  useEffect(() => {
+    if (booking) return undefined; // booking aktifken (pop-up açıkken) gereksiz
+
+    const intervalId = setInterval(() => {
+      loadSeatData({ silent: true });
+    }, 10000); // 10 saniyede bir
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking, showtimeId]);
+
   const selectedSeats = useMemo(
     () => seats.filter((seat) => selectedSeatIds.includes(getSeatId(seat))),
     [seats, selectedSeatIds],
@@ -320,7 +321,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   const isCustomer = normalizedRole === "CUSTOMER";
   const bookingAccessMessage =
     status === "authenticated" && !isCustomer
-      ? "Booking olusturmak icin customer hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
+      ? "Rezervasyon olusturmak icin musteri hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
       : "";
   const bookingBlockedMessage =
     bookingUnavailableMessage || bookingAccessMessage;
@@ -352,7 +353,7 @@ export default function SeatSelectionClient({ showtimeId }) {
 
     const shouldExit = window.confirm(BOOKING_EXIT_CONFIRM_MESSAGE);
     if (shouldExit) {
-      unlockAllSelectedSeats(); // fire-and-forget
+      unlockAllSelectedSeats();
       resetBookingFlow();
     }
     return shouldExit;
@@ -459,15 +460,12 @@ export default function SeatSelectionClient({ showtimeId }) {
 
     try {
       if (isAlreadySelected) {
-        // KOLTUK KALDIRILIYOR (deselect)
         try {
           await unlockSeat(
             { showtimeId: Number(showtimeId), seatId, lockToken },
             session.accessToken,
           );
         } catch (unlockError) {
-          // 409: backend "bu artık senin kilidin değil" diyor (TTL zaten dolmuş olabilir).
-          // Yine de koltuğu UI'da "seçili" bırakmanın anlamı yok, normal deselect akışına devam ediyoruz.
           if (unlockError.status !== 409) {
             throw unlockError;
           }
@@ -484,7 +482,6 @@ export default function SeatSelectionClient({ showtimeId }) {
 
         await loadSeatData({ silent: true });
       } else {
-        // KOLTUK EKLENİYOR (select)
         const result = await lockSeat(
           {
             showtimeId: Number(showtimeId),
@@ -509,7 +506,7 @@ export default function SeatSelectionClient({ showtimeId }) {
   async function handleCreateBooking() {
     if (!session?.accessToken) {
       setErrorMessage(
-        "Booking olusturmak icin customer olarak giris yapmalisin.",
+        "Rezervasyon olusturmak icin musteri olarak giris yapmalisin.",
       );
       return;
     }
@@ -540,7 +537,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       setPayment(null);
       setPaymentError("");
       setBooking(createdBooking);
-      setSuccessMessage(`Booking #${createdBooking?.id || ""} olusturuldu.`);
+      setSuccessMessage(`Rezervasyon #${createdBooking?.id || ""} olusturuldu.`);
       await loadSeatData({ silent: true, skipSelectionFilter: true });
     } catch (error) {
       setErrorMessage(translateBookingError(error.message));
@@ -551,7 +548,7 @@ export default function SeatSelectionClient({ showtimeId }) {
 
   async function handlePayment(payload) {
     if (!booking?.id) {
-      setPaymentError("Odeme icin gecerli bir booking bulunamadi.");
+      setPaymentError("Odeme icin gecerli bir rezervasyon bulunamadi.");
       return;
     }
 
@@ -589,22 +586,16 @@ export default function SeatSelectionClient({ showtimeId }) {
     } catch (error) {
       // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
     } finally {
-      // DİKKAT — artık resetBookingFlow() ÇAĞRILMIYOR.
-      // Redis kilidi hâlâ aktif (backend artık booking oluşunca silmiyor),
-      // bu yüzden selectedSeatIds/lockToken/lockExpiresAt'e dokunmuyoruz —
-      // kullanıcı aynı koltuklarla, kalan süreyle seçim ekranına geri dönüyor.
+      // DİKKAT — resetBookingFlow() burada ÇAĞRILMIYOR. Redis kilidi hâlâ aktif
+      // (backend booking oluşunca artık silmiyor), bu yüzden selectedSeatIds/
+      // lockToken/lockExpiresAt'e dokunmuyoruz — kullanıcı aynı koltuklarla,
+      // kalan süreyle seçim ekranına geri dönüyor.
       setBooking(null);
       setPayment(null);
       setPaymentError("");
       setSuccessMessage("");
-      await loadSeatData({ silent: true, skipSelectionFilter: true }); // YENİ EKLENEN
+      await loadSeatData({ silent: true, skipSelectionFilter: true });
     }
-  }
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   }
 
   return (
@@ -614,7 +605,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       </Link>
 
       <div className={styles.header}>
-        <span className='ct-eyebrow'>Seat Selection</span>
+        <span className='ct-eyebrow'>Koltuk Secimi</span>
         <h1>Koltuk secimi</h1>
         <p>
           {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
@@ -673,11 +664,10 @@ export default function SeatSelectionClient({ showtimeId }) {
         <PaymentModal onClose={handleClosePaymentModal}>
           <div className={styles.successPanel}>
             <CheckCircle2 size={22} />
-            Booking #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
+            Rezervasyon #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
             tamamlayabilirsin.
           </div>
 
-          {/* YENİ EKLENEN — sayaç artık ödeme ekranında da görünüyor */}
           {remainingSeconds !== null && (
             <p
               className={

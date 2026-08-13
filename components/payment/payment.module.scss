@@ -133,6 +133,17 @@
   }
 }
 
+.notice {
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(247, 198, 91, 0.22);
+  border-radius: 0.85rem;
+  color: rgba(248, 243, 232, 0.84);
+  background: rgba(247, 198, 91, 0.1);
+  font-weight: 750;
+}
+
 .resultDetails {
   width: 100%;
   margin: 0;

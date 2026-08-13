@@ -23,9 +23,9 @@ export const FOOTER_LINK_GROUPS = [
     title: "Kurumsal",
     links: [
       { label: "Hakkimizda", href: "/about" },
-      { label: "Gizlilik", href: "/about" },
-      { label: "Kullanim", href: "/about" },
-      { label: "Destek", href: "/about" },
+      { label: "Gizlilik", href: "/privacy" },
+      { label: "Kullanim", href: "/terms" },
+      { label: "Destek", href: "/support" },
     ],
   },
 ];

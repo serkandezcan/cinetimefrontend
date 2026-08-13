@@ -3,12 +3,25 @@ import { RefreshCw, Ticket } from "lucide-react";
 import { getSeatId, getSeatLabel } from "@/helpers/seat-helpers";
 import styles from "./seat-selection.module.scss";
 
+const RESERVATION_STATUS_LABELS = {
+  PENDING: "Odeme bekliyor",
+  CONFIRMED: "Onaylandi",
+  CANCELLED: "Iptal edildi",
+};
+
+function getReservationStatusLabel(status) {
+  return (
+    RESERVATION_STATUS_LABELS[String(status || "PENDING").toUpperCase()] ||
+    "Odeme bekliyor"
+  );
+}
+
 export default function BookingSummary({
   showtime,
   selectedSeats = [],
   totalPrice = 0,
   seatPrice = 0,
-  remainingSeconds = null, // YENİ EKLENEN
+  remainingSeconds = null,
   isSubmitting,
   isAuthenticated,
   booking,
@@ -18,7 +31,8 @@ export default function BookingSummary({
   successMessage,
   onCreateBooking,
   onRefresh,
-}) {  function formatTime(seconds) {
+}) {
+  function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
@@ -26,7 +40,7 @@ export default function BookingSummary({
 
   return (
     <aside className={styles.summaryPanel}>
-      <span className='ct-eyebrow'>Booking Summary</span>
+      <span className='ct-eyebrow'>Rezervasyon ozeti</span>
       <h2>Secim ozeti</h2>
 
       <div className={styles.summaryFacts}>
@@ -53,7 +67,6 @@ export default function BookingSummary({
         )}
       </div>
 
-      {/* YENİ EKLENEN — geri sayım */}
       {remainingSeconds !== null && !booking && (
         <p
           className={
@@ -63,11 +76,6 @@ export default function BookingSummary({
           Koltuk secim sureniz: <strong>{formatTime(remainingSeconds)}</strong>
         </p>
       )}
-
-      <div className={styles.totalRow}>
-        <span>Toplam</span>
-        <strong>{totalPrice.toFixed(2)} TL</strong>
-      </div>
 
       <div className={styles.totalRow}>
         <span>Toplam</span>
@@ -88,7 +96,7 @@ export default function BookingSummary({
 
       {!isAuthenticated && (
         <Link href='/login' className='ct-button ct-button-ghost'>
-          Booking icin giris yap
+          Rezervasyon icin giris yap
         </Link>
       )}
 
@@ -106,8 +114,8 @@ export default function BookingSummary({
 
       {booking && (
         <div className={styles.bookingResult}>
-          <strong>Booking #{booking.id}</strong>
-          <span>{booking.status || "PENDING"}</span>
+          <strong>Rezervasyon #{booking.id}</strong>
+          <span>{getReservationStatusLabel(booking.status)}</span>
         </div>
       )}
 

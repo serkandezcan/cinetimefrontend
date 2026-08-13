@@ -8,7 +8,7 @@ import TicketCard from "./TicketCard";
 import styles from "./ticket-list.module.scss";
 
 const CANCEL_CONFIRM_MESSAGE =
-  "Bu bileti iptal etmek istiyor musun? Ayni booking icindeki diger biletler de iptal edilebilir.";
+  "Bu bileti iptal etmek istiyor musun? Ayni rezervasyon icindeki diger biletler de iptal edilebilir.";
 
 export default function TicketList({ tickets = [] }) {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function TicketList({ tickets = [] }) {
 
   async function handleCancel(ticket) {
     if (!ticket?.bookingId) {
-      setErrorMessage("Bu bilet icin booking bilgisi bulunamadi.");
+      setErrorMessage("Bu bilet icin rezervasyon bilgisi bulunamadi.");
       return;
     }
 
@@ -38,7 +38,7 @@ export default function TicketList({ tickets = [] }) {
 
     try {
       await cancelBooking(ticket.bookingId, session.accessToken);
-      setMessage(`Booking #${ticket.bookingId} iptal edildi.`);
+      setMessage(`Rezervasyon #${ticket.bookingId} iptal edildi.`);
       startTransition(() => router.refresh());
     } catch (error) {
       setErrorMessage(error.message || "Bilet iptal edilemedi.");
@@ -48,11 +48,11 @@ export default function TicketList({ tickets = [] }) {
   }
 
   if (!Array.isArray(tickets) || tickets.length === 0) {
-    return <p className={styles.emptyState}>No tickets found.</p>;
+    return <p className={styles.emptyState}>Bilet bulunamadi.</p>;
   }
 
   return (
-    <section className={styles.section} aria-label="Ticket list">
+    <section className={styles.section} aria-label="Bilet listesi">
       {message && <p className={styles.success}>{message}</p>}
       {errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
 

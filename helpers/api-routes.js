@@ -78,7 +78,11 @@ export const API_ROUTES = {
     createShowtime: "/admin/showtimes", // POST
     cancelShowtime: (id) => `/admin/showtimes/${id}/cancel`, // PATCH
     createHall: "/admin/halls", // POST
+    updateHall: (id) => `/admin/halls/${id}`, // PUT
+    deleteHall: (id) => `/admin/halls/${id}`, // DELETE
     createCinema: "/admin/cinemas", // POST
+    updateCinema: (id) => `/admin/cinemas/${id}`, // PUT
+    deleteCinema: (id) => `/admin/cinemas/${id}`, // DELETE
   },
 
   // Customer - reservation/booking operations.

@@ -78,6 +78,7 @@ const SOCIAL_ICONS = {
   youtube: YouTubeIcon,
 };
 
+
 function normalizeRole(role) {
   return String(role ?? "").replace(/^ROLE_/, "").toUpperCase();
 }
@@ -152,7 +153,6 @@ export default function Footer() {
 
       <div className={styles.bottomBar}>
         <span>{FOOTER_MESSAGES.copyright(year)}</span>
-        <span>Frontend shell by Alperen - feature/home-shell</span>
       </div>
     </footer>
   );

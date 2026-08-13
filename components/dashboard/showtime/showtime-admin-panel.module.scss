@@ -1,4 +1,4 @@
-﻿@use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
 .page {
   width: min(100% - 32px, $container-max-width);
@@ -50,7 +50,23 @@
     color: $color-text;
     background: rgba($color-bg, 0.52);
     outline: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
   }
+
+  select option {
+    color: #111827;
+    background: #fffaf0;
+  }
+}
+
+.fieldHint {
+  color: rgba($color-danger, 0.92);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .fullRow {
