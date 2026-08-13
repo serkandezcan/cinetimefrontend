@@ -138,8 +138,6 @@ export default function SeatSelectionClient({ showtimeId }) {
   }
 
   // Kalan süreyi her saniye hesaplayan sayaç.
-  // Süre dolduğunda: varsa booking'i backend'de İPTAL ETMEYİ BEKLİYORUZ,
-  // sonra local state'i sıfırlıyoruz, sonra koltuk haritasını tazeliyoruz.
   useEffect(() => {
     if (!lockExpiresAt) {
       setRemainingSeconds(null);
@@ -168,7 +166,7 @@ export default function SeatSelectionClient({ showtimeId }) {
         setErrorMessage(
           "Koltuk secim sureniz doldu, lutfen tekrar secim yapin.",
         );
-        handleExpiry(); // fire-and-forget — tick senkron kalıyor, içeride await sırası garanti
+        handleExpiry();
       }
     }
 
@@ -180,8 +178,6 @@ export default function SeatSelectionClient({ showtimeId }) {
   }, [lockExpiresAt, booking?.id, session?.accessToken]);
 
   // Sayfa yenilendiğinde daha önceki koltuk kilidini geri yükler.
-  // sessionStorage'daki bilgi bayat olabileceği için (TTL sunucuda çoktan dolmuş olabilir),
-  // körü körüne güvenmek yerine her koltuk için tekrar lockSeat çağırarak sunucuya doğrulatıyoruz.
   useEffect(() => {
     const raw = sessionStorage.getItem(getSeatLockStorageKey(showtimeId));
 
@@ -296,14 +292,13 @@ export default function SeatSelectionClient({ showtimeId }) {
     };
   }, [showtimeId]);
 
-  // Koltuk haritasını periyodik olarak sessizce tazele — başka kullanıcıların
-  // kilitlediği/serbest bıraktığı koltukları manuel yenileme yapmadan görebilelim.
+  // Koltuk haritasını periyodik olarak sessizce tazele.
   useEffect(() => {
-    if (booking) return undefined; // booking aktifken (pop-up açıkken) gereksiz
+    if (booking) return undefined;
 
     const intervalId = setInterval(() => {
       loadSeatData({ silent: true });
-    }, 10000); // 10 saniyede bir
+    }, 10000);
 
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -537,7 +532,9 @@ export default function SeatSelectionClient({ showtimeId }) {
       setPayment(null);
       setPaymentError("");
       setBooking(createdBooking);
-      setSuccessMessage(`Rezervasyon #${createdBooking?.id || ""} olusturuldu.`);
+      setSuccessMessage(
+        `Rezervasyon #${createdBooking?.id || ""} olusturuldu.`,
+      );
       await loadSeatData({ silent: true, skipSelectionFilter: true });
     } catch (error) {
       setErrorMessage(translateBookingError(error.message));
@@ -586,10 +583,6 @@ export default function SeatSelectionClient({ showtimeId }) {
     } catch (error) {
       // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
     } finally {
-      // DİKKAT — resetBookingFlow() burada ÇAĞRILMIYOR. Redis kilidi hâlâ aktif
-      // (backend booking oluşunca artık silmiyor), bu yüzden selectedSeatIds/
-      // lockToken/lockExpiresAt'e dokunmuyoruz — kullanıcı aynı koltuklarla,
-      // kalan süreyle seçim ekranına geri dönüyor.
       setBooking(null);
       setPayment(null);
       setPaymentError("");
@@ -605,7 +598,7 @@ export default function SeatSelectionClient({ showtimeId }) {
       </Link>
 
       <div className={styles.header}>
-        <span className='ct-eyebrow'>Koltuk Secimi</span>
+        <span className='ct-eyebrow'>Koltuk secimi</span>
         <h1>Koltuk secimi</h1>
         <p>
           {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
@@ -664,8 +657,8 @@ export default function SeatSelectionClient({ showtimeId }) {
         <PaymentModal onClose={handleClosePaymentModal}>
           <div className={styles.successPanel}>
             <CheckCircle2 size={22} />
-            Rezervasyon #{booking.id} olusturuldu. Odeme bilgilerini girerek islemi
-            tamamlayabilirsin.
+            Rezervasyon #{booking.id} olusturuldu. Odeme bilgilerini girerek
+            islemi tamamlayabilirsin.
           </div>
 
           {remainingSeconds !== null && (
