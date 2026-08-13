@@ -144,6 +144,15 @@
   border-color: rgba($color-danger, 0.18);
   background: rgba($color-danger, 0.18);
 }
+// YENİ EKLENEN — başka bir kullanıcı tarafından geçici olarak kilitli koltuk.
+// bookedSeat'ten (kalıcı, kırmızı) kasıtlı olarak farklı bir renk (amber/turuncu) —
+// kullanıcı "bu geçici, birkaç dakika içinde açılabilir" ayrımını görsel olarak anlasın.
+.lockedSeat {
+  color: rgba($color-text, 0.5);
+  border-color: rgba(#f5a623, 0.4);
+  background: rgba(#f5a623, 0.22);
+  cursor: not-allowed;
+}
 
 .premiumSeat:not(.selectedSeat):not(.bookedSeat) {
   border-color: rgba($color-blue, 0.46);
@@ -191,6 +200,9 @@
 
 .legendPremium {
   background: rgba($color-blue, 0.32);
+}
+.legendLocked {
+  background: rgba(#f5a623, 0.35);
 }
 
 .summaryPanel {
@@ -260,6 +272,32 @@
     background: $color-gold;
     font-size: 0.85rem;
     font-weight: 950;
+  }
+}
+
+.countdown {
+  margin-top: 15;
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: rgba($color-text, 0.8);
+  background: rgba($color-text, 0.06);
+  font-weight: 850;
+  font-size: 0.9rem;
+ 
+
+
+  strong {
+    color: $color-gold;
+  }
+}
+
+.countdownUrgent {
+  @extend .countdown;
+  color: $color-text;
+  background: rgba($color-danger, 0.2);
+
+  strong {
+    color: $color-danger;
   }
 }
 
@@ -399,4 +437,5 @@
     width: 38px;
     height: 38px;
   }
+ 
 }

@@ -21,6 +21,7 @@ export default function BookingSummary({
   selectedSeats = [],
   totalPrice = 0,
   seatPrice = 0,
+  remainingSeconds = null,
   isSubmitting,
   isAuthenticated,
   booking,
@@ -31,9 +32,15 @@ export default function BookingSummary({
   onCreateBooking,
   onRefresh,
 }) {
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }
+
   return (
     <aside className={styles.summaryPanel}>
-      <span className="ct-eyebrow">Rezervasyon ozeti</span>
+      <span className='ct-eyebrow'>Rezervasyon ozeti</span>
       <h2>Secim ozeti</h2>
 
       <div className={styles.summaryFacts}>
@@ -60,31 +67,48 @@ export default function BookingSummary({
         )}
       </div>
 
+      {remainingSeconds !== null && !booking && (
+        <p
+          className={
+            remainingSeconds <= 30 ? styles.countdownUrgent : styles.countdown
+          }
+        >
+          Koltuk secim sureniz: <strong>{formatTime(remainingSeconds)}</strong>
+        </p>
+      )}
+
       <div className={styles.totalRow}>
         <span>Toplam</span>
         <strong>{totalPrice.toFixed(2)} TL</strong>
       </div>
 
       {!isBookable && bookingUnavailableMessage && (
-        <p className={styles.warning} role="status">{bookingUnavailableMessage}</p>
+        <p className={styles.warning} role='status'>
+          {bookingUnavailableMessage}
+        </p>
       )}
-      {errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
+      {errorMessage && (
+        <p className={styles.error} role='alert'>
+          {errorMessage}
+        </p>
+      )}
       {successMessage && <p className={styles.success}>{successMessage}</p>}
 
       {!isAuthenticated && (
-        <Link href="/login" className="ct-button ct-button-ghost">
+        <Link href='/login' className='ct-button ct-button-ghost'>
           Rezervasyon icin giris yap
         </Link>
       )}
 
       {isAuthenticated && !booking && (
         <button
-          type="button"
-          className="ct-button ct-button-primary"
+          type='button'
+          className='ct-button ct-button-primary'
           onClick={onCreateBooking}
           disabled={isSubmitting || selectedSeats.length === 0 || !isBookable}
         >
-          <Ticket size={17} /> {isSubmitting ? "Yer ayriliyor..." : "Yerimi ayir"}
+          <Ticket size={17} />{" "}
+          {isSubmitting ? "Rezervasyon olusturuluyor..." : "Odemeye gec"}
         </button>
       )}
 
@@ -95,7 +119,11 @@ export default function BookingSummary({
         </div>
       )}
 
-      <button type="button" className={styles.refreshButton} onClick={onRefresh}>
+      <button
+        type='button'
+        className={styles.refreshButton}
+        onClick={onRefresh}
+      >
         <RefreshCw size={15} /> Koltuklari yenile
       </button>
     </aside>

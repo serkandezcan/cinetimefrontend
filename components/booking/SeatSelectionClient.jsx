@@ -5,9 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ArrowLeft, CheckCircle2, RefreshCw } from "lucide-react";
-import { getSeatId, isSeatAvailable } from "@/helpers/seat-helpers";
-import { getShowtimeUnavailableMessage, translateBookingError } from "@/helpers/showtime-helpers";
-import { createBooking, completePayment } from "@/services/booking-service";
+import {
+  getSeatId,
+  isSeatAvailable,
+  isSeatBooked,
+} from "@/helpers/seat-helpers";
+import {
+  getShowtimeUnavailableMessage,
+  translateBookingError,
+} from "@/helpers/showtime-helpers";
+import {
+  createBooking,
+  completePayment,
+  cancelBooking,
+} from "@/services/booking-service";
 import { getShowtimeSeats, getShowtimes } from "@/services/showtime-service";
 import BookingSummary from "./BookingSummary";
 import SeatLegend from "./SeatLegend";
@@ -15,9 +26,12 @@ import SeatMap from "./SeatMap";
 import styles from "./seat-selection.module.scss";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentResult from "@/components/payment/PaymentResult";
+import { lockSeat, unlockSeat } from "@/services/seat-lock-service";
+import PaymentModal from "../../components/booking/PaymentModal";
+import { config } from "@/helpers/config";
 
 const BOOKING_EXIT_CONFIRM_MESSAGE =
-  "Rezervasyon adimindan cikmak istiyor musun? Secili koltuklar ve odeme akisi sifirlanacak.";
+  "Biletleme adimindan cikmak istiyor musun? Secili koltuklar ve bu ekrandaki rezervasyon akisi sifirlanacak.";
 
 function getShowtimeDate(showtime) {
   if (!showtime) return "Tarih yok";
@@ -28,13 +42,26 @@ function getShowtimeDate(showtime) {
 
 function getShowtimeTime(showtime) {
   if (!showtime) return "--:--";
-  if (showtime.startTime?.includes("T")) return showtime.startTime.slice(11, 16);
+  if (showtime.startTime?.includes("T"))
+    return showtime.startTime.slice(11, 16);
   if (showtime.startTime) return showtime.startTime.slice(0, 5);
   return "--:--";
 }
 
 function normalizeSessionRole(role) {
-  return String(role ?? "").replace(/^ROLE_/, "").toUpperCase();
+  return String(role ?? "")
+    .replace(/^ROLE_/, "")
+    .toUpperCase();
+}
+
+function getSeatLockStorageKey(showtimeId) {
+  return `ct-seat-lock:${showtimeId}`;
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
 export default function SeatSelectionClient({ showtimeId }) {
@@ -51,9 +78,31 @@ export default function SeatSelectionClient({ showtimeId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const paymentSectionRef = useRef(null);
+  const [lockToken, setLockToken] = useState(null);
+  const [lockingSeatId, setLockingSeatId] = useState(null);
+  const [lockExpiresAt, setLockExpiresAt] = useState(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
 
-  async function loadSeatData({ silent = false } = {}) {
+  // sessionStorage restore/write effect'leri arasındaki yarış durumunu önlemek için.
+  const hasHydratedRef = useRef(false);
+
+  const resetBookingFlow = useCallback(() => {
+    setSelectedSeatIds([]);
+    setBooking(null);
+    setPayment(null);
+    setPaymentError("");
+    setIsPaying(false);
+    setErrorMessage("");
+    setSuccessMessage("");
+    setLockToken(null);
+    setLockExpiresAt(null);
+    sessionStorage.removeItem(getSeatLockStorageKey(showtimeId));
+  }, [showtimeId]);
+
+  async function loadSeatData({
+    silent = false,
+    skipSelectionFilter = false,
+  } = {}) {
     if (!silent) setIsLoading(true);
     setErrorMessage("");
 
@@ -65,18 +114,151 @@ export default function SeatSelectionClient({ showtimeId }) {
 
       const normalizedSeats = Array.isArray(seatList) ? seatList : [];
       setSeats(normalizedSeats);
-      setShowtime((showtimeList || []).find((item) => String(item.id) === String(showtimeId)) || null);
-      setSelectedSeatIds((current) =>
-        current.filter((id) =>
-          normalizedSeats.some((seat) => String(getSeatId(seat)) === String(id) && isSeatAvailable(seat))
-        )
+      setShowtime(
+        (showtimeList || []).find(
+          (item) => String(item.id) === String(showtimeId),
+        ) || null,
       );
+
+      setSelectedSeatIds((current) => {
+        if (skipSelectionFilter) return current;
+
+        return current.filter((id) =>
+          normalizedSeats.some(
+            (seat) =>
+              String(getSeatId(seat)) === String(id) && !isSeatBooked(seat),
+          ),
+        );
+      });
     } catch (error) {
       setErrorMessage(error.message || "Koltuk bilgileri yuklenemedi.");
     } finally {
       if (!silent) setIsLoading(false);
     }
   }
+
+  // Kalan süreyi her saniye hesaplayan sayaç.
+  useEffect(() => {
+    if (!lockExpiresAt) {
+      setRemainingSeconds(null);
+      return undefined;
+    }
+
+    async function handleExpiry() {
+      if (booking?.id && session?.accessToken) {
+        try {
+          await cancelBooking(booking.id, session.accessToken);
+        } catch (error) {
+          // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
+        }
+      }
+
+      resetBookingFlow();
+      await loadSeatData({ silent: true });
+    }
+
+    function tick() {
+      const diffMs = new Date(lockExpiresAt).getTime() - Date.now();
+      const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
+      setRemainingSeconds(diffSeconds);
+
+      if (diffSeconds === 0) {
+        setErrorMessage(
+          "Koltuk secim sureniz doldu, lutfen tekrar secim yapin.",
+        );
+        handleExpiry();
+      }
+    }
+
+    tick();
+    const intervalId = setInterval(tick, 1000);
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockExpiresAt, booking?.id, session?.accessToken]);
+
+  // Sayfa yenilendiğinde daha önceki koltuk kilidini geri yükler.
+  useEffect(() => {
+    const raw = sessionStorage.getItem(getSeatLockStorageKey(showtimeId));
+
+    if (!raw) {
+      hasHydratedRef.current = true;
+      return undefined;
+    }
+
+    if (!session?.accessToken) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function revalidateAndRestore() {
+      try {
+        const saved = JSON.parse(raw);
+        const expiresAtMs = new Date(saved.lockExpiresAt).getTime();
+
+        if (
+          !saved.lockToken ||
+          !Array.isArray(saved.selectedSeatIds) ||
+          saved.selectedSeatIds.length === 0 ||
+          expiresAtMs <= Date.now()
+        ) {
+          sessionStorage.removeItem(getSeatLockStorageKey(showtimeId));
+          return;
+        }
+
+        let currentToken = saved.lockToken;
+        let latestExpiresAt = saved.lockExpiresAt;
+
+        for (const seatId of saved.selectedSeatIds) {
+          const result = await lockSeat(
+            { showtimeId: Number(showtimeId), seatId, lockToken: currentToken },
+            session.accessToken,
+          );
+          currentToken = result.lockToken;
+          latestExpiresAt = result.expiresAt;
+        }
+
+        if (cancelled) return;
+
+        setSelectedSeatIds(saved.selectedSeatIds);
+        setLockToken(currentToken);
+        setLockExpiresAt(latestExpiresAt);
+      } catch {
+        sessionStorage.removeItem(getSeatLockStorageKey(showtimeId));
+        if (!cancelled) {
+          setErrorMessage(
+            "Onceki koltuk seciminizin suresi dolmus, lutfen tekrar secim yapin.",
+          );
+        }
+      } finally {
+        if (!cancelled) hasHydratedRef.current = true;
+      }
+    }
+
+    revalidateAndRestore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showtimeId, session?.accessToken]);
+
+  // Koltuk seçimi/kilit bilgisi değiştikçe sessionStorage'ı güncel tut.
+  useEffect(() => {
+    if (!hasHydratedRef.current) return;
+
+    const key = getSeatLockStorageKey(showtimeId);
+
+    if (selectedSeatIds.length === 0 || !lockToken) {
+      sessionStorage.removeItem(key);
+      return;
+    }
+
+    sessionStorage.setItem(
+      key,
+      JSON.stringify({ selectedSeatIds, lockToken, lockExpiresAt }),
+    );
+  }, [showtimeId, selectedSeatIds, lockToken, lockExpiresAt]);
 
   useEffect(() => {
     let isMounted = true;
@@ -90,9 +272,14 @@ export default function SeatSelectionClient({ showtimeId }) {
 
         if (!isMounted) return;
         setSeats(Array.isArray(seatList) ? seatList : []);
-        setShowtime((showtimeList || []).find((item) => String(item.id) === String(showtimeId)) || null);
+        setShowtime(
+          (showtimeList || []).find(
+            (item) => String(item.id) === String(showtimeId),
+          ) || null,
+        );
       } catch (error) {
-        if (isMounted) setErrorMessage(error.message || "Koltuk bilgileri yuklenemedi.");
+        if (isMounted)
+          setErrorMessage(error.message || "Koltuk bilgileri yuklenemedi.");
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -105,9 +292,21 @@ export default function SeatSelectionClient({ showtimeId }) {
     };
   }, [showtimeId]);
 
+  // Koltuk haritasını periyodik olarak sessizce tazele.
+  useEffect(() => {
+    if (booking) return undefined;
+
+    const intervalId = setInterval(() => {
+      loadSeatData({ silent: true });
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking, showtimeId]);
+
   const selectedSeats = useMemo(
     () => seats.filter((seat) => selectedSeatIds.includes(getSeatId(seat))),
-    [seats, selectedSeatIds]
+    [seats, selectedSeatIds],
   );
 
   const seatPrice = Number(showtime?.price || 0);
@@ -115,45 +314,53 @@ export default function SeatSelectionClient({ showtimeId }) {
   const bookingUnavailableMessage = getShowtimeUnavailableMessage(showtime);
   const normalizedRole = normalizeSessionRole(session?.user?.role);
   const isCustomer = normalizedRole === "CUSTOMER";
-  const bookingAccessMessage = status === "authenticated" && !isCustomer
-    ? "Rezervasyon olusturmak icin musteri hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
-    : "";
-  const bookingBlockedMessage = bookingUnavailableMessage || bookingAccessMessage;
+  const bookingAccessMessage =
+    status === "authenticated" && !isCustomer
+      ? "Rezervasyon olusturmak icin musteri hesabi ile giris yapmalisin. Admin hesabi bu akista sadece koltuklari goruntuleyebilir."
+      : "";
+  const bookingBlockedMessage =
+    bookingUnavailableMessage || bookingAccessMessage;
   const isBookable = !bookingBlockedMessage;
-   
+
   const hasBookingProgress =
     selectedSeatIds.length > 0 ||
     (Boolean(booking) && !payment) ||
     isSubmitting ||
     isPaying;
 
+  // Seçili tüm koltukları backend'de serbest bırakır (best-effort, paralel).
+  async function unlockAllSelectedSeats() {
+    if (!lockToken || selectedSeatIds.length === 0 || !session?.accessToken)
+      return;
 
-  useEffect(() => {
-    if (!booking || payment) return;
-    paymentSectionRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, [booking, payment]);
-
-  const resetBookingFlow = useCallback(() => {
-    setSelectedSeatIds([]);
-    setBooking(null);
-    setPayment(null);
-    setPaymentError("");
-    setIsPaying(false);
-    setErrorMessage("");
-    setSuccessMessage("");
-
-  }, []);
+    await Promise.allSettled(
+      selectedSeatIds.map((seatId) =>
+        unlockSeat(
+          { showtimeId: Number(showtimeId), seatId, lockToken },
+          session.accessToken,
+        ),
+      ),
+    );
+  }
 
   const confirmBookingExit = useCallback(() => {
     if (!hasBookingProgress) return true;
 
     const shouldExit = window.confirm(BOOKING_EXIT_CONFIRM_MESSAGE);
-    if (shouldExit) resetBookingFlow();
+    if (shouldExit) {
+      unlockAllSelectedSeats();
+      resetBookingFlow();
+    }
     return shouldExit;
-  }, [hasBookingProgress, resetBookingFlow]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    hasBookingProgress,
+    resetBookingFlow,
+    lockToken,
+    selectedSeatIds,
+    showtimeId,
+    session?.accessToken,
+  ]);
 
   useEffect(() => {
     if (!hasBookingProgress) return undefined;
@@ -167,14 +374,48 @@ export default function SeatSelectionClient({ showtimeId }) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasBookingProgress]);
 
+  // Sekme kapatılırken / sayfa yenilenirken best-effort unlock isteği.
+  useEffect(() => {
+    function handleUnload() {
+      if (!lockToken || selectedSeatIds.length === 0 || !session?.accessToken)
+        return;
+
+      selectedSeatIds.forEach((seatId) => {
+        fetch(`${config.apiURL}/customer/seats/unlock`, {
+          method: "POST",
+          keepalive: true,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+          body: JSON.stringify({
+            showtimeId: Number(showtimeId),
+            seatId,
+            lockToken,
+          }),
+        });
+      });
+    }
+
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, [lockToken, selectedSeatIds, showtimeId, session?.accessToken]);
+
   useEffect(() => {
     function handleDocumentClick(event) {
-      if (!hasBookingProgress || event.defaultPrevented || event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (!hasBookingProgress || event.defaultPrevented || event.button !== 0)
+        return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
 
       const target = event.target instanceof Element ? event.target : null;
       const anchor = target?.closest("a[href]");
-      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+      if (
+        !anchor ||
+        anchor.target === "_blank" ||
+        anchor.hasAttribute("download")
+      )
+        return;
 
       const href = anchor.getAttribute("href");
       if (!href || href.startsWith("#")) return;
@@ -191,25 +432,77 @@ export default function SeatSelectionClient({ showtimeId }) {
     }
 
     document.addEventListener("click", handleDocumentClick, true);
-    return () => document.removeEventListener("click", handleDocumentClick, true);
+    return () =>
+      document.removeEventListener("click", handleDocumentClick, true);
   }, [confirmBookingExit, hasBookingProgress, router]);
 
-  function handleToggleSeat(seat) {
-    if (!isSeatAvailable(seat) || booking || !isBookable) return;
-
+  async function handleToggleSeat(seat) {
     const seatId = getSeatId(seat);
-    setSuccessMessage("");
-    setErrorMessage("");
-    setSelectedSeatIds((current) =>
-      current.includes(seatId)
-        ? current.filter((id) => id !== seatId)
-        : [...current, seatId]
+    const isAlreadySelected = selectedSeatIds.some(
+      (id) => String(id) === String(seatId),
     );
+
+    if (
+      (!isSeatAvailable(seat) && !isAlreadySelected) ||
+      booking ||
+      !isBookable
+    )
+      return;
+    if (lockingSeatId) return;
+
+    setLockingSeatId(seatId);
+    setErrorMessage("");
+
+    try {
+      if (isAlreadySelected) {
+        try {
+          await unlockSeat(
+            { showtimeId: Number(showtimeId), seatId, lockToken },
+            session.accessToken,
+          );
+        } catch (unlockError) {
+          if (unlockError.status !== 409) {
+            throw unlockError;
+          }
+        }
+
+        setSelectedSeatIds((current) => {
+          const next = current.filter((id) => String(id) !== String(seatId));
+          if (next.length === 0) {
+            setLockToken(null);
+            setLockExpiresAt(null);
+          }
+          return next;
+        });
+
+        await loadSeatData({ silent: true });
+      } else {
+        const result = await lockSeat(
+          {
+            showtimeId: Number(showtimeId),
+            seatId,
+            lockToken: lockToken || undefined,
+          },
+          session.accessToken,
+        );
+
+        setLockToken(result.lockToken);
+        setLockExpiresAt(result.expiresAt);
+        setSelectedSeatIds((current) => [...current, seatId]);
+      }
+    } catch (error) {
+      setErrorMessage(error.message || "Koltuk işlemi başarısız oldu.");
+      await loadSeatData({ silent: true });
+    } finally {
+      setLockingSeatId(null);
+    }
   }
 
   async function handleCreateBooking() {
     if (!session?.accessToken) {
-      setErrorMessage("Rezervasyon olusturmak icin musteri olarak giris yapmalisin.");
+      setErrorMessage(
+        "Rezervasyon olusturmak icin musteri olarak giris yapmalisin.",
+      );
       return;
     }
 
@@ -232,22 +525,24 @@ export default function SeatSelectionClient({ showtimeId }) {
         {
           showtimeId: Number(showtimeId),
           seatIds: selectedSeatIds.map(Number),
+          lockToken,
         },
-        session.accessToken
+        session.accessToken,
       );
       setPayment(null);
       setPaymentError("");
       setBooking(createdBooking);
       setSuccessMessage(
-        `Yeriniz ayrildi. Rezervasyon #${createdBooking?.id || ""} olusturuldu. Simdi odeme yapabilirsiniz.`
+        `Rezervasyon #${createdBooking?.id || ""} olusturuldu.`,
       );
-      await loadSeatData({ silent: true });
+      await loadSeatData({ silent: true, skipSelectionFilter: true });
     } catch (error) {
       setErrorMessage(translateBookingError(error.message));
     } finally {
       setIsSubmitting(false);
     }
   }
+
   async function handlePayment(payload) {
     if (!booking?.id) {
       setPaymentError("Odeme icin gecerli bir rezervasyon bulunamadi.");
@@ -277,14 +572,33 @@ export default function SeatSelectionClient({ showtimeId }) {
       setIsPaying(false);
     }
   }
+
+  async function handleClosePaymentModal() {
+    if (!booking?.id) {
+      return;
+    }
+
+    try {
+      await cancelBooking(booking.id, session.accessToken);
+    } catch (error) {
+      // Booking zaten iptal/expire olmuş olabilir, hatayı yutuyoruz
+    } finally {
+      setBooking(null);
+      setPayment(null);
+      setPaymentError("");
+      setSuccessMessage("");
+      await loadSeatData({ silent: true, skipSelectionFilter: true });
+    }
+  }
+
   return (
     <section className={styles.page}>
-      <Link href="/showtimes" className={styles.backLink}>
+      <Link href='/showtimes' className={styles.backLink}>
         <ArrowLeft size={18} /> Seanslara don
       </Link>
 
       <div className={styles.header}>
-        <span className="ct-eyebrow">Koltuk secimi</span>
+        <span className='ct-eyebrow'>Koltuk secimi</span>
         <h1>Koltuk secimi</h1>
         <p>
           {showtime?.movieTitle || `Seans #${showtimeId}`} /{" "}
@@ -298,10 +612,10 @@ export default function SeatSelectionClient({ showtimeId }) {
       )}
 
       {!isLoading && errorMessage && !seats.length && (
-        <div className={styles.stateBox} role="alert">
+        <div className={styles.stateBox} role='alert'>
           <strong>Koltuklar alinamadi.</strong>
           <span>{errorMessage}</span>
-          <button type="button" onClick={() => loadSeatData()}>
+          <button type='button' onClick={() => loadSeatData()}>
             <RefreshCw size={16} /> Tekrar dene
           </button>
         </div>
@@ -325,6 +639,7 @@ export default function SeatSelectionClient({ showtimeId }) {
             selectedSeats={selectedSeats}
             totalPrice={totalPrice}
             seatPrice={seatPrice}
+            remainingSeconds={remainingSeconds}
             isSubmitting={isSubmitting}
             isAuthenticated={status === "authenticated"}
             booking={booking}
@@ -337,28 +652,41 @@ export default function SeatSelectionClient({ showtimeId }) {
           />
         </div>
       )}
+
       {booking && !payment && (
-        <section
-          ref={paymentSectionRef}
-          className={styles.paymentStep}
-          aria-live="polite"
-        >
+        <PaymentModal onClose={handleClosePaymentModal}>
           <div className={styles.successPanel}>
             <CheckCircle2 size={22} />
-            Yeriniz ayrildi. Rezervasyon #{booking.id} olusturuldu. Simdi odeme
-            yapabilirsiniz.
+            Rezervasyon #{booking.id} olusturuldu. Odeme bilgilerini girerek
+            islemi tamamlayabilirsin.
           </div>
+
+          {remainingSeconds !== null && (
+            <p
+              className={
+                remainingSeconds <= 30
+                  ? styles.countdownUrgent
+                  : styles.countdown
+              }
+            >
+              Odeme icin kalan sureniz:{" "}
+              <strong>{formatTime(remainingSeconds)}</strong>
+            </p>
+          )}
 
           <PaymentForm
             isSubmitting={isPaying}
             errorMessage={paymentError}
             onSubmit={handlePayment}
           />
-        </section>
+        </PaymentModal>
       )}
 
-      {payment && <PaymentResult payment={payment} bookingId={booking.id} />}
-      
+      {payment && (
+        <PaymentModal closable={false}>
+          <PaymentResult payment={payment} bookingId={booking.id} />
+        </PaymentModal>
+      )}
     </section>
   );
 }
